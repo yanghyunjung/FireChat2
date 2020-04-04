@@ -53,7 +53,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-//sdasdqwdqwd
+//sdasdqwdqwdqweq3weq1eqqwe
     static final int RC_LOGIN = 1; //  로그인 액티비티 호출을 구별하기 위한 식별 번호이다.
     FirebaseUser currentUser = null; // 현재 사용자
 
