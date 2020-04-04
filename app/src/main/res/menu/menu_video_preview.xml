@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_horizontalMode"
+        android:title="@string/horizontal_mode"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_verticalMode"
+        android:title="@string/vertical_mode"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_startVideo"
+        android:title="@string/start"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_stopVideo"
+        android:title="@string/stop"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_exit"
+        android:title="@string/Exit"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_removeVideo"
+        android:title="@string/delete"
+        app:showAsAction="ifRoom" />
+</menu>

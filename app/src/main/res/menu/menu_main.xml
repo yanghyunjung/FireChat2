@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_login"
+        android:title="@string/login"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_logout"
+        android:title="@string/logout"
+        app:showAsAction="always" />
+
+    <item android:id="@+id/scroll"
+        android:title="@string/scroll" app:showAsAction="ifRoom" />
+    <item android:id="@+id/action_removeAll"
+        android:title="@string/action_removeAll" app:showAsAction="ifRoom" />
+    <item android:id="@+id/action_rename"
+        android:title="@string/action_rename" app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_photoUpload"
+        android:title="@string/action_photoUpload"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_videoUpload"
+        android:title="@string/action_videoUpload"
+        app:showAsAction="ifRoom" />
+</menu>

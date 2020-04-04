@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">FireChat2</string>
+    <string name="scroll">스크롤</string>
+    <string name="action_removeAll">전체삭제</string>
+    <string name="action_rename">이름변경</string>
+    <string name="set_scroll_free">자유_스크롤_설정</string>
+    <string name="send">전송</string>
+    <string name="login">로그인</string>
+    <string name="logout">로그아웃</string>
+    <string name="init_inform">앱 실행이 안 되면, 앱을 완전히 껐다. 다시 켜주세요.</string>
+    <string name="action_photoUpload">사진 업로드</string>
+    <string name="Exit">나가기</string>
+    <string name="edit">수정</string>
+    <string name="delete">삭제</string>
+    <string name="start">시작</string>
+    <string name="stop">정지</string>
+    <string name="search">검색</string>
+    <string name="upload">업로드</string>
+    <string name="action_videoUpload">비디오 업로드</string>
+    <string name="horizontal_mode">가로 고정</string>
+    <string name="vertical_mode">세로 고정</string>
+</resources>
