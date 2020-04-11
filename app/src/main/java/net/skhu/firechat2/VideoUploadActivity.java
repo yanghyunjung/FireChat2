@@ -1,21 +1,24 @@
 package net.skhu.firechat2;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.firebase.ui.auth.IdpResponse;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,6 +27,11 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -40,6 +48,8 @@ public class VideoUploadActivity extends AppCompatActivity {
 
     String filename;
     String mediaType;
+
+    File path;
 
     static final int RC_LOGIN = 2; //  로그인 액티비티 호출을 구별하기 위한 식별 번호이다.
     FirebaseUser currentUser = null; // 현재 사용자
@@ -177,10 +187,65 @@ public class VideoUploadActivity extends AppCompatActivity {
             storageRef.putFile(filePath)
                     //성공시
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @RequiresApi(api = Build.VERSION_CODES.O)
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             progressDialog.dismiss(); //업로드 진행 Dialog 상자 닫기
                             Toast.makeText(getApplicationContext(), "업로드 완료!", Toast.LENGTH_SHORT).show();
+
+                            try {
+                                path = getFilesDir();
+
+                                //저장하는 파일의 이름
+                                final File file = new File(path, filename);
+
+                                file.createNewFile();
+
+                                Cursor cursor = getContentResolver().query(filePath, null, null, null);
+                                cursor.moveToNext();
+                                String pathStr = cursor.getString(cursor.getColumnIndex("_data"));
+                                cursor.close();
+
+                                final File originalFile = new File(pathStr);
+
+                                String downloadVideoName = filename;
+
+                                Log.v("pjw", "\noriginalFile Path " + originalFile.toString());
+                                Log.v("pjw", "\nfile Path " + file.toString());
+
+                                try {
+
+                                    FileInputStream inputStream = new FileInputStream(originalFile);
+
+                                    FileOutputStream outputStream = new FileOutputStream(file);
+
+                                    int bytesRead = 0;
+
+                                    byte[] buffer = new byte[1024];
+
+                                    while ((bytesRead = inputStream.read(buffer, 0, 1024)) != -1) {
+                                        outputStream.write(buffer, 0, bytesRead);
+                                    }
+
+                                    outputStream.close();
+
+                                    inputStream.close();
+
+                                } catch (FileNotFoundException e) {
+                                    // TODO Auto-generated catch block
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    // TODO Auto-generated catch block
+                                    e.printStackTrace();
+                                }
+                            }
+                            catch (FileNotFoundException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
 
                             Intent intent = new Intent();
                             intent.putExtra("downloadVideoFileName", filename);

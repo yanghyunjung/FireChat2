@@ -36,4 +36,11 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:text="@string/upload" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:text="@string/do_not_exit_for_upload" />
 </LinearLayout>

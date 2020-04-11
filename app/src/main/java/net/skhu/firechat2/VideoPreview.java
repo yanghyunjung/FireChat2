@@ -1,35 +1,24 @@
 package net.skhu.firechat2;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-
-import android.content.ContentUris;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import java.io.File;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
-import static androidx.core.content.FileProvider.getUriForFile;
+import java.io.File;
 
 public class VideoPreview extends AppCompatActivity {
 
@@ -178,8 +167,8 @@ public class VideoPreview extends AppCompatActivity {
             return true;
         }
         else if (id == R.id.action_removeVideo) {
-            String key = ((MainActivity) MainActivity.mContext).itemList.getKey(selectIndex);
-            ((MainActivity) MainActivity.mContext).firebaseDbService.removeFromServer(key);
+            String key = ((RoomActivity) RoomActivity.mContext).itemList.getKey(selectIndex);
+            ((RoomActivity) RoomActivity.mContext).firebaseDbService.removeFromServer(key);
             this.finish();
             return true;
         }

@@ -1,5 +1,6 @@
 package net.skhu.firechat2;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,7 +17,15 @@ import android.widget.VideoView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+
 import java.io.File;
+import java.io.IOException;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     class ViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
@@ -40,7 +49,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         @Override
         public void onClick(View view) {
-            MainActivity activity = (MainActivity)view.getContext();
+            RoomActivity activity = (RoomActivity)view.getContext();
             activity.showItemEditDialog(super.getAdapterPosition());
         }
     }
@@ -85,7 +94,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         public void onClick(View view) {
             Item item = itemList.get(super.getAdapterPosition());
 
-            MainActivity activity = (MainActivity)view.getContext();
+            RoomActivity activity = (RoomActivity)view.getContext();
             //activity.showPhotoDialog(super.getAdapterPosition());
 
             Intent intent = new Intent(activity, PhotoPreview.class);
@@ -100,6 +109,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         //CheckBox checkBox;
         VideoView videoView;
 
+        String downloadFileName;
+        int selectVideoIndex;
+        File path;
 
         public ViewHolderVideo(View view) {
             super(view);
@@ -132,19 +144,97 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     videoView.seekTo(0);
                 }
             });
+
+            videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+                    return true;
+                }
+            });
         }
 
         @Override
         public void onClick(View view) {
-            Item item = itemList.get(super.getAdapterPosition());
+            final Item item = itemList.get(super.getAdapterPosition());
+            int index = super.getAdapterPosition();
 
-            MainActivity activity = (MainActivity)view.getContext();
+            final RoomActivity activity = (RoomActivity)view.getContext();
             //activity.showPhotoDialog(super.getAdapterPosition());
 
-            Intent intent = new Intent(activity, VideoPreview.class);
-            intent.putExtra("videoFileName", item.getVideoFileName());
-            intent.putExtra("selectIndex", super.getAdapterPosition());
-            activity.startActivity(intent);
+            downloadFileName = itemList.get(index).getVideoFileName();
+
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReferenceFromUrl("gs://firechat-51553.appspot.com").child("videos/" + downloadFileName);
+
+            selectVideoIndex = index;
+
+
+            try{
+
+                //로컬에 저장할 폴더의 위치
+                path = context.getFilesDir();
+
+                //저장하는 파일의 이름
+                final File file = new File(path, downloadFileName);
+                try {
+                    if (!path.exists()) {
+                        //저장할 폴더가 없으면 생성
+                        path.mkdirs();
+                    }
+
+                    if (!file.exists()) {
+                        final ProgressDialog progressDialog = new ProgressDialog(activity);
+                        progressDialog.setTitle("다운로드중...");
+                        progressDialog.show();
+
+                        file.createNewFile();
+                        //파일을 다운로드하는 Task 생성, 비동기식으로 진행
+                        final FileDownloadTask fileDownloadTask = storageRef.getFile(file);
+                        fileDownloadTask.addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                            int VideoIndex = selectVideoIndex;
+                            String videoFileName = item.getVideoFileName();
+                            @Override
+                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                progressDialog.dismiss(); //업로드 진행 Dialog 상자 닫기
+                                //다운로드 성공 후 할 일
+                                Toast.makeText(context, file.getPath() + "다운로드 성공", Toast.LENGTH_LONG).show();
+                                /*Intent intent = new Intent(activity, VideoPreview.class);
+                                intent.putExtra("videoFileName", videoFileName);
+                                intent.putExtra("selectIndex", VideoIndex);
+                                activity.startActivity(intent);*/
+
+                                notifyItemChanged(VideoIndex);
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                //다운로드 실패 후 할 일
+                                Toast.makeText(context, file.getPath() + "다운로드 실패", Toast.LENGTH_LONG).show();
+                            }
+                        }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
+                            @Override
+                            //진행상태 표시
+                            public void onProgress(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                @SuppressWarnings("VisibleForTests") //이걸 넣어 줘야 아랫줄에 에러가 사라진다. 넌 누구냐?
+                                        double progress = (100 * taskSnapshot.getBytesTransferred()) /  taskSnapshot.getTotalByteCount();
+                                //dialog에 진행률을 퍼센트로 출력해 준다
+                                progressDialog.setMessage("download " + ((int) progress) + "% ...");
+                            }
+                        });
+                    }
+                    else{
+                        Intent intent = new Intent(activity, VideoPreview.class);
+                        intent.putExtra("videoFileN" +
+                                "ame", item.getVideoFileName());
+                        intent.putExtra("selectIndex", selectVideoIndex);
+                        activity.startActivity(intent);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } catch(Exception e){
+                e.printStackTrace();
+            }
         }
     }
 

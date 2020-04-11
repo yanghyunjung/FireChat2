@@ -15,7 +15,7 @@ public class ItemEditDialogFragment extends DialogFragment {
     // 수정 대화상자를 만드는 메소드.  이 메소드는 대화상자를 새로 만들어야 할 때에만 호출된다.
     // 한 번 만들어진 대화상자는 계속 재사용 된다.
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final MainActivity activity = (MainActivity)getActivity();  // 액티비티 객체에 대한 참조 얻기
+        final RoomActivity activity = (RoomActivity)getActivity();  // 액티비티 객체에 대한 참조 얻기
         final Item item = activity.itemList.get(activity.selectedIndex); // 선택된 항목 얻기
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("수정"); // 대화 상자의 제목 설정하기

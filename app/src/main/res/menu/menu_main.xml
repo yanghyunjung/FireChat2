@@ -11,19 +11,8 @@
         android:title="@string/logout"
         app:showAsAction="always" />
 
-    <item android:id="@+id/scroll"
-        android:title="@string/scroll" app:showAsAction="ifRoom" />
-    <item android:id="@+id/action_removeAll"
-        android:title="@string/action_removeAll" app:showAsAction="ifRoom" />
-    <item android:id="@+id/action_rename"
-        android:title="@string/action_rename" app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_photoUpload"
-        android:title="@string/action_photoUpload"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/action_videoUpload"
-        android:title="@string/action_videoUpload"
-        app:showAsAction="ifRoom" />
+        android:id="@+id/action_create_room"
+        android:title="@string/action_create_room"
+        app:showAsAction="always" />
 </menu>

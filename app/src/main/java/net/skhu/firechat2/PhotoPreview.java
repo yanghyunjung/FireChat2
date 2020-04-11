@@ -1,18 +1,14 @@
 package net.skhu.firechat2;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
 
@@ -55,8 +51,8 @@ public class PhotoPreview extends AppCompatActivity {
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_delete) {
-            String key = ((MainActivity)MainActivity.mContext).itemList.getKey(selectIndex);
-            ((MainActivity)MainActivity.mContext).firebaseDbService.removeFromServer(key);
+            String key = ((RoomActivity) RoomActivity.mContext).itemList.getKey(selectIndex);
+            ((RoomActivity) RoomActivity.mContext).firebaseDbService.removeFromServer(key);
             finish();
             return true;
         }

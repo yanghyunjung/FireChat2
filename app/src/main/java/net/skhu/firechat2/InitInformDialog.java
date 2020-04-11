@@ -5,11 +5,8 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
 
 import androidx.fragment.app.DialogFragment;
-
-import com.google.firebase.auth.FirebaseAuth;
 
 public class InitInformDialog extends DialogFragment {
     @Override
