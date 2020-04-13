@@ -216,6 +216,8 @@ public class MainActivity extends AppCompatActivity {
                     firebaseDbServiceForRoom.removeFromServer(roomKey);
                 }
             }
+
+            roomRecyclerViewAdapter.notifyDataSetChanged();//여기서 화면 갱신 안 해주면, recyclerView크기 갑자기 변함
         }
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); //세로모드 고정
