@@ -21,6 +21,10 @@ import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import net.skhu.firechat2.FirebaseDBService.FirebaseDbServiceForRoom;
+import net.skhu.firechat2.Item.RoomItemList;
+import net.skhu.firechat2.Room.ItemEditDialogFragment;
+
 import java.util.Arrays;
 import java.util.List;
 

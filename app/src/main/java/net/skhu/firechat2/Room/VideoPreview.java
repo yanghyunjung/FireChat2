@@ -1,4 +1,4 @@
-package net.skhu.firechat2;
+package net.skhu.firechat2.Room;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -17,6 +17,9 @@ import android.widget.VideoView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+
+import net.skhu.firechat2.BuildConfig;
+import net.skhu.firechat2.R;
 
 import java.io.File;
 

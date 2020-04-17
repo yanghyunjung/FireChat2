@@ -1,4 +1,4 @@
-package net.skhu.firechat2;
+package net.skhu.firechat2.FirebaseDBService;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -8,6 +8,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,6 +27,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import net.skhu.firechat2.R;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -97,7 +100,7 @@ public class VideoUploadActivity extends AppCompatActivity {
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 pickIntent.setType("video/*");
                 startActivityForResult(pickIntent, VIDEO);
 

@@ -1,4 +1,4 @@
-package net.skhu.firechat2;
+package net.skhu.firechat2.Room;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -9,6 +9,8 @@ import android.widget.CheckBox;
 import android.widget.Toast;
 
 import androidx.fragment.app.DialogFragment;
+
+import net.skhu.firechat2.R;
 
 public class ScrollDiolog extends DialogFragment {
 

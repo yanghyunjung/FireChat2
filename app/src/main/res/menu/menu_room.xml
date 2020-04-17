@@ -27,4 +27,9 @@
         android:id="@+id/action_videoUpload"
         android:title="@string/action_videoUpload"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_musicUpload"
+        android:title="@string/action_musicUpload"
+        app:showAsAction="ifRoom" />
 </menu>

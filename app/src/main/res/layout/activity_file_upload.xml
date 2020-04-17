@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FileUploadActivity">
+    tools:context=".FirebaseDBService.FileUploadActivity">
 
     <TextView
         android:layout_gravity="center_horizontal"

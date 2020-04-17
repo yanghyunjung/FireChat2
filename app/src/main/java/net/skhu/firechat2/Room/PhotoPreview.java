@@ -1,4 +1,4 @@
-package net.skhu.firechat2;
+package net.skhu.firechat2.Room;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,6 +9,8 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import net.skhu.firechat2.R;
 
 import java.io.File;
 

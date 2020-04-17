@@ -1,4 +1,4 @@
-package net.skhu.firechat2;
+package net.skhu.firechat2.Room;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -34,6 +34,15 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 
+import net.skhu.firechat2.FirebaseDBService.FileUploadActivity;
+import net.skhu.firechat2.FirebaseDBService.FirebaseDbService;
+import net.skhu.firechat2.FirebaseDBService.MusicUploadActivity;
+import net.skhu.firechat2.FirebaseDBService.VideoUploadActivity;
+import net.skhu.firechat2.InitInformDialog;
+import net.skhu.firechat2.Item.Item;
+import net.skhu.firechat2.Item.ItemList;
+import net.skhu.firechat2.R;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -52,6 +61,7 @@ public class RoomActivity extends AppCompatActivity {
     RenameDiolog renameDiolog;//이름 변경 대화상자 관리자
     ScrollDiolog scrollDiolog;
     InitInformDialog initInformDialog;
+    MusicPreviewDialog musicPreviewDialog;
 
 
     BooleanCommunication checkedFreeScroll;
@@ -68,6 +78,12 @@ public class RoomActivity extends AppCompatActivity {
 
     String roomKey;
     String roomName;
+
+    final int DOWNLOAD_MUSIC = 4;
+    String downloadMusicFileName;
+
+    final int DOWNLOAD_BINARY_FILE = 5;
+    String downloadBinaryFileName;
 
     public static Context mContext;
 
@@ -176,6 +192,13 @@ public class RoomActivity extends AppCompatActivity {
         scrollDiolog.show(getSupportFragmentManager(), "EditDialog"); // 화면에 대화상자 보이기
     }
 
+    public void showMusicPreviewDialog() {
+        if (musicPreviewDialog == null) {// 대화상자 관리자 객체를 아직 만들지 않았다면
+            musicPreviewDialog = new MusicPreviewDialog(); // 대화상자 관리자 객체를 만든다
+        }
+        musicPreviewDialog.show(getSupportFragmentManager(), "EditDialog"); // 화면에 대화상자 보이기
+    }
+
 
     //////////////////////////////////////////////////////////////////
 
@@ -212,6 +235,10 @@ public class RoomActivity extends AppCompatActivity {
             intent.putExtra("roomKey", roomKey);
             setResult(Activity.RESULT_OK, intent);
             finish();
+        }
+        else if (id == R.id.action_musicUpload) {
+            Intent intent = new Intent(this, MusicUploadActivity.class);
+            startActivityForResult(intent, DOWNLOAD_MUSIC);
         }
 
         return super.onOptionsItemSelected(menuItem);
@@ -267,6 +294,72 @@ public class RoomActivity extends AppCompatActivity {
                         item.setUserName(userName);
                         item.setVideoFileName(downloadVideoFileName);
                         item.setHaveVideo(true);
+                        firebaseDbService.addIntoServer(item);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        if (requestCode == DOWNLOAD_MUSIC) {
+            if (resultCode == Activity.RESULT_OK) {
+                extras = data.getExtras();
+                //Toast.makeText(this, "onActivityResult 됨", Toast.LENGTH_SHORT).show();
+                if (extras != null) {
+                    downloadMusicFileName = extras.getString("downloadMusicFileName");
+                    Uri filePath = data.getParcelableExtra("originalPath");
+
+                    Toast.makeText(this, downloadMusicFileName, Toast.LENGTH_LONG).show();
+
+                    //final FirebaseStorage storage = FirebaseStorage.getInstance();
+                    //StorageReference storageRef = storage.getReferenceFromUrl("gs://firechat-51553.appspot.com").child("videos/" + downloadVideoFileName);
+
+                    //Toast.makeText(this, downloadVideoFileName, Toast.LENGTH_SHORT).show();
+
+                    try {
+                        //로컬에 저장할 폴더의 위치
+
+
+                        Item item = new Item("음악");
+                        item.setUserName(userName);
+                        item.setMusicFileName(downloadMusicFileName);
+                        item.setHaveMusic(true);
+                        firebaseDbService.addIntoServer(item);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        if (requestCode == DOWNLOAD_BINARY_FILE) {
+            if (resultCode == Activity.RESULT_OK) {
+                extras = data.getExtras();
+                //Toast.makeText(this, "onActivityResult 됨", Toast.LENGTH_SHORT).show();
+                if (extras != null) {
+                    downloadBinaryFileName = extras.getString("downloadBinaryFileName");
+                    String realBinaryFileName = extras.getString("realBinaryFileName");
+                    Uri filePath = data.getParcelableExtra("originalPath");
+
+                    Toast.makeText(this, downloadBinaryFileName, Toast.LENGTH_LONG).show();
+
+                    //final FirebaseStorage storage = FirebaseStorage.getInstance();
+                    //StorageReference storageRef = storage.getReferenceFromUrl("gs://firechat-51553.appspot.com").child("videos/" + downloadVideoFileName);
+
+                    //Toast.makeText(this, downloadVideoFileName, Toast.LENGTH_SHORT).show();
+
+                    try {
+                        //로컬에 저장할 폴더의 위치
+
+
+                        Item item = new Item("파일");
+                        item.setUserName(userName);
+                        item.setBinaryFileName(downloadBinaryFileName);
+                        item.setRealBinaryFileName(realBinaryFileName);
+                        item.setHaveBinaryFile(true);
                         firebaseDbService.addIntoServer(item);
 
                     } catch (Exception e) {

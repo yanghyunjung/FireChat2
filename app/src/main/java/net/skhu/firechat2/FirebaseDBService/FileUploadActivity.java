@@ -1,8 +1,9 @@
-package net.skhu.firechat2;
+package net.skhu.firechat2.FirebaseDBService;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -25,7 +26,12 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import net.skhu.firechat2.R;
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -125,6 +131,96 @@ public class FileUploadActivity extends AppCompatActivity {
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             progressDialog.dismiss(); //업로드 진행 Dialog 상자 닫기
                             Toast.makeText(getApplicationContext(), "업로드 완료!", Toast.LENGTH_SHORT).show();
+
+                            //Uri externalUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                            String[] projection = new String[]{
+                                    MediaStore.Images.Media._ID,
+                                    MediaStore.Images.Media.DISPLAY_NAME,
+                                    MediaStore.Images.Media.MIME_TYPE
+                            };
+
+                            Cursor cursor = getContentResolver().query(filePath, projection, null, null, null);
+
+                            if (cursor == null || !cursor.moveToFirst()) {
+                                Log.e("TAG", "cursor null or cursor is empty");
+                            }
+                            else {
+                                do {
+                                    String contentUrl = filePath.toString() + "/" + cursor.getString(0);
+
+                                    path = getFilesDir();
+
+                                    //저장하는 파일의 이름
+                                    final File file = new File(path, filename);
+
+                                    try {
+                                        file.createNewFile();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                /*Cursor cursor = getContentResolver().query(filePath, null, null, null);
+                                cursor.moveToNext();
+                                String pathStr = cursor.getString(cursor.getColumnIndex("_data"));
+                                cursor.close();
+
+                                final File originalFile = new File(pathStr);
+
+                                String downloadVideoName = filename;
+
+                                Log.v("pjw", "\noriginalFile Path " + originalFile.toString());
+                                Log.v("pjw", "\nfile Path " + file.toString());*/
+
+                                    try {
+
+                                        FileInputStream inputStream = new FileInputStream(contentUrl);
+
+                                        FileOutputStream outputStream = new FileOutputStream(file);
+
+                                        int bytesRead = 0;
+
+                                        byte[] buffer = new byte[1024];
+
+                                        while ((bytesRead = inputStream.read(buffer, 0, 1024)) != -1) {
+                                            outputStream.write(buffer, 0, bytesRead);
+                                        }
+
+                                        outputStream.close();
+
+                                        inputStream.close();
+
+                                    } catch (FileNotFoundException e) {
+                                        // TODO Auto-generated catch block
+                                        e.printStackTrace();
+                                    } catch (IOException e) {
+                                        // TODO Auto-generated catch block
+                                        e.printStackTrace();
+                                    }
+
+                                    Log.v("pjw", "\nfile Path " + file.toString());
+
+                                /*try {
+                                    InputStream is = getContentResolver().openInputStream(Uri.parse(contentUrl));
+                                    OutputStream os;
+
+
+                                    int data = 0;
+                                    StringBuilder sb = new StringBuilder();
+
+                                    while ((data = is.read()) != -1) {
+                                        sb.append((char) data);
+                                    }
+
+                                    is.close();
+
+                                } catch (FileNotFoundException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }*/
+
+                                } while (cursor.moveToNext());
+                            }
 
                             Intent intent = new Intent();
                             intent.putExtra("downloadFileName", filename);

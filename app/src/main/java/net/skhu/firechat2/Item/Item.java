@@ -1,4 +1,4 @@
-package net.skhu.firechat2;
+package net.skhu.firechat2.Item;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -14,7 +14,54 @@ public class Item {
     boolean haveVideo;
     String videoFileName;
 
-    static SimpleDateFormat format = new SimpleDateFormat("HH시 mm분");
+    boolean haveMusic;
+    String musicFileName;
+
+    boolean haveBinaryFile;
+    String BinaryFileName;
+    String realBinaryFileName;
+
+    public boolean getHaveBinaryFile() {
+        return haveBinaryFile;
+    }
+
+    public void setHaveBinaryFile(boolean haveBinaryFile) {
+        this.haveBinaryFile = haveBinaryFile;
+    }
+
+    public String getBinaryFileName() {
+        return BinaryFileName;
+    }
+
+    public void setBinaryFileName(String binaryFileName) {
+        BinaryFileName = binaryFileName;
+    }
+
+    public String getRealBinaryFileName() {
+        return realBinaryFileName;
+    }
+
+    public void setRealBinaryFileName(String realBinaryFileName) {
+        this.realBinaryFileName = realBinaryFileName;
+    }
+
+    public boolean getHaveMusic() {
+        return haveMusic;
+    }
+
+    public void setHaveMusic(boolean haveMusic) {
+        this.haveMusic = haveMusic;
+    }
+
+    public String getMusicFileName() {
+        return musicFileName;
+    }
+
+    public void setMusicFileName(String musicFileName) {
+        this.musicFileName = musicFileName;
+    }
+
+   static SimpleDateFormat format = new SimpleDateFormat("HH시 mm분");
 
     public Item() {
     }
@@ -24,6 +71,8 @@ public class Item {
         this.createTime = new Date();
         havePhoto = false;
         haveVideo = false;
+        haveMusic = false;
+        haveBinaryFile = false;
     }
 
     public String getUserName(){

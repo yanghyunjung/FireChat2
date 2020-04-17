@@ -10,6 +10,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.skhu.firechat2.Item.RoomItem;
+import net.skhu.firechat2.Item.RoomItemList;
+import net.skhu.firechat2.Room.RoomActivity;
+
 public class RoomRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     class ViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
         TextView textViewRoomTitle;

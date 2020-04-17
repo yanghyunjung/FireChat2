@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textViewNameInMusic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/imageView" />
+
+        <ImageView
+            android:layout_width="180sp"
+            android:layout_height="180sp"
+            android:layout_margin="10dp"
+            app:srcCompat="@drawable/music_icon" />
+
+    <TextView
+        android:id="@+id/textViewTimeInMusic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:text="TextView"
+        android:textSize="12sp"/>
+
+</LinearLayout>

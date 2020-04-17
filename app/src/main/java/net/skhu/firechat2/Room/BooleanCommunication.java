@@ -1,4 +1,4 @@
-package net.skhu.firechat2;
+package net.skhu.firechat2.Room;
 
 public class BooleanCommunication {
     boolean b;

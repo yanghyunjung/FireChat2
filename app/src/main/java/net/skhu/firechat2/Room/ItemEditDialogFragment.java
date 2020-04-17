@@ -1,4 +1,4 @@
-package net.skhu.firechat2;
+package net.skhu.firechat2.Room;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -8,6 +8,9 @@ import android.view.View;
 import android.widget.EditText;
 
 import androidx.fragment.app.DialogFragment;
+
+import net.skhu.firechat2.Item.Item;
+import net.skhu.firechat2.R;
 
 public class ItemEditDialogFragment extends DialogFragment {
 

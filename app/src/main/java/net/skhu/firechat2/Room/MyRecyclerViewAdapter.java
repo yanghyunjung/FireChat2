@@ -1,4 +1,4 @@
-package net.skhu.firechat2;
+package net.skhu.firechat2.Room;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -23,6 +23,10 @@ import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
+
+import net.skhu.firechat2.Item.Item;
+import net.skhu.firechat2.Item.ItemList;
+import net.skhu.firechat2.R;
 
 import java.io.File;
 import java.io.IOException;
@@ -224,10 +228,113 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     }
                     else{
                         Intent intent = new Intent(activity, VideoPreview.class);
-                        intent.putExtra("videoFileN" +
-                                "ame", item.getVideoFileName());
+                        intent.putExtra("videoFileName", item.getVideoFileName());
                         intent.putExtra("selectIndex", selectVideoIndex);
                         activity.startActivity(intent);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    class ViewHolderMusic extends RecyclerView.ViewHolder  implements View.OnClickListener {
+        TextView textViewNameInMusic, textViewTimeInMusic;
+        //CheckBox checkBox;
+
+        String downloadFileName;
+        int selectVideoIndex;
+        File path;
+
+        public ViewHolderMusic(View view) {
+            super(view);
+            this.textViewNameInMusic = view.findViewById(R.id.textViewNameInMusic);
+            this.textViewTimeInMusic = view.findViewById(R.id.textViewTimeInMusic);
+
+            view.setOnClickListener(this);
+        }
+
+        //RecyclerView에 보이는 내용을 설정하는 함수입니다.
+        public void setData() {
+            Item item = itemList.get(super.getAdapterPosition());
+            this.textViewNameInMusic.setText(item.getUserName());
+            this.textViewTimeInMusic.setText(item.getCreateTimeFormatted());
+
+            File path = context.getFilesDir();
+            File musicFile = new File(path, item.getMusicFileName());
+        }
+
+        @Override
+        public void onClick(View view) {
+            final Item item = itemList.get(super.getAdapterPosition());
+            int index = super.getAdapterPosition();
+
+            final RoomActivity activity = (RoomActivity)view.getContext();
+            //activity.showPhotoDialog(super.getAdapterPosition());
+
+            downloadFileName = itemList.get(index).getMusicFileName();
+
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReferenceFromUrl("gs://firechat-51553.appspot.com").child("audio/" + downloadFileName);
+
+            selectVideoIndex = index;
+
+
+            try{
+
+                //로컬에 저장할 폴더의 위치
+                path = context.getFilesDir();
+
+                //저장하는 파일의 이름
+                final File file = new File(path, downloadFileName);
+                try {
+                    if (!path.exists()) {
+                        //저장할 폴더가 없으면 생성
+                        path.mkdirs();
+                    }
+
+                    if (!file.exists()) {
+                        final ProgressDialog progressDialog = new ProgressDialog(activity);
+                        progressDialog.setTitle("다운로드중...");
+                        progressDialog.show();
+
+                        file.createNewFile();
+                        //파일을 다운로드하는 Task 생성, 비동기식으로 진행
+                        final FileDownloadTask fileDownloadTask = storageRef.getFile(file);
+                        fileDownloadTask.addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                            int MusicIndex = selectVideoIndex;
+                            String musicFileName = item.getMusicFileName();
+                            @Override
+                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                progressDialog.dismiss(); //업로드 진행 Dialog 상자 닫기
+                                //다운로드 성공 후 할 일
+                                Toast.makeText(context, file.getPath() + "다운로드 성공", Toast.LENGTH_LONG).show();
+
+                                notifyItemChanged(MusicIndex);
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                //다운로드 실패 후 할 일
+                                Toast.makeText(context, file.getPath() + "다운로드 실패", Toast.LENGTH_LONG).show();
+                            }
+                        }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
+                            @Override
+                            //진행상태 표시
+                            public void onProgress(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                @SuppressWarnings("VisibleForTests") //이걸 넣어 줘야 아랫줄에 에러가 사라진다. 넌 누구냐?
+                                        double progress = (100 * taskSnapshot.getBytesTransferred()) /  taskSnapshot.getTotalByteCount();
+                                //dialog에 진행률을 퍼센트로 출력해 준다
+                                progressDialog.setMessage("download " + ((int) progress) + "% ...");
+                            }
+                        });
+                    }
+                    else{
+                        activity.selectedIndex = super.getAdapterPosition();
+                        activity.showMusicPreviewDialog();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -245,6 +352,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     final int MESSAGE=0;
     final int PHOTO=1;
     final int VIDEO=2;
+    final int MUSIC=3;
 
     public MyRecyclerViewAdapter(Context context, ItemList itemList) {
         this.layoutInflater = LayoutInflater.from(context);
@@ -271,6 +379,10 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             View view = layoutInflater.inflate(R.layout.item_video, viewGroup, false);
             return new ViewHolderVideo(view);
         }
+        else if (viewType == MUSIC){
+            View view = layoutInflater.inflate(R.layout.item_music, viewGroup, false);
+            return new ViewHolderMusic(view);
+        }
 
         View view = layoutInflater.inflate(R.layout.item, viewGroup, false);
         return new ViewHolder(view);
@@ -287,6 +399,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         else if (viewHolder instanceof ViewHolderVideo) {
             ((ViewHolderVideo)viewHolder).setData();
         }
+        else if (viewHolder instanceof ViewHolderMusic) {
+            ((ViewHolderMusic)viewHolder).setData();
+        }
         else{
             ((ViewHolder)viewHolder).setData();
         }
@@ -299,6 +414,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         }
         else if(itemList.get(position).getHaveVideo()){
             return VIDEO;
+        }
+        else if(itemList.get(position).getHaveMusic()){
+            return MUSIC;
         }
         else {
             return MESSAGE;

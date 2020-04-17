@@ -1,4 +1,4 @@
-package net.skhu.firechat2;
+package net.skhu.firechat2.Item;
 
 public class RoomItem {
     String roomName;

@@ -1,4 +1,4 @@
-package net.skhu.firechat2;
+package net.skhu.firechat2.FirebaseDBService;
 
 import android.content.Context;
 import android.util.Log;
@@ -10,6 +10,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import net.skhu.firechat2.Item.RoomItem;
+import net.skhu.firechat2.Item.RoomItemList;
+import net.skhu.firechat2.Room.BooleanCommunication;
+import net.skhu.firechat2.RoomRecyclerViewAdapter;
 
 import java.io.File;
 
@@ -82,7 +87,7 @@ public class FirebaseDbServiceForRoom implements ChildEventListener {
         // DB에 새 데이터 항목이 등록되었을 때, 이 메소드가 자동으로 호출된다.
         // dataSnapshot은 서버에서 등록된 새 데이터 항목이다.
         String key = dataSnapshot.getKey(); // 새 데이터 항목의 키 값을 꺼낸다.
-        RoomItem RoomItem = dataSnapshot.getValue(net.skhu.firechat2.RoomItem.class);  // 새 데이터 항목을 꺼낸다.
+        RoomItem RoomItem = dataSnapshot.getValue(net.skhu.firechat2.Item.RoomItem.class);  // 새 데이터 항목을 꺼낸다.
         int index = roomItemList.add(key, RoomItem); // 새 데이터를 itemList에 등록한다.
         // key 값으로 등록된 데이터 항목이 없었기 때문에 새 데이터 항목이 등록된다.
 
@@ -103,7 +108,7 @@ public class FirebaseDbServiceForRoom implements ChildEventListener {
         // DB의 어떤 데이터 항목이 수정되었을 때, 이 메소드가 자동으로 호출된다.
         // dataSnapshot은 서버에서 수정된 데이터 항목이다.
         String key = dataSnapshot.getKey();  // 수정된 데이터 항목의 키 값을 꺼낸다.
-        RoomItem RoomItem = dataSnapshot.getValue(net.skhu.firechat2.RoomItem.class); // 수정된 데이터 항목을 꺼낸다.
+        RoomItem RoomItem = dataSnapshot.getValue(net.skhu.firechat2.Item.RoomItem.class); // 수정된 데이터 항목을 꺼낸다.
         int index = roomItemList.update(key, RoomItem);  // 수정된 데이터를 itemList에 대입한다.
         // 전에 key 값으로 등록되었던 데이터가  덮어써진다. (overwrite)
         roomRecyclerViewAdapter.notifyItemChanged(index); // RecyclerView를 다시 그린다.

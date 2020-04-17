@@ -9,6 +9,8 @@ import android.widget.EditText;
 
 import androidx.fragment.app.DialogFragment;
 
+import net.skhu.firechat2.Item.RoomItem;
+
 public class RoomCreateDialog  extends DialogFragment {
 
     //스크롤 설정 다이얼로그

@@ -1,15 +1,16 @@
-package net.skhu.firechat2;
+package net.skhu.firechat2.Item;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RoomItemList {
+// Item 객체의 목록과, firebase DB의 키(string) 목록을 관리하는 클래스
+public class ItemList {
     List<String> keys = new ArrayList<String>();
-    List<RoomItem> RoomItems = new ArrayList<RoomItem>();
+    List<Item> items = new ArrayList<Item>();
 
     // index 위치의 Item 객체를 리턴
-    public RoomItem get(int index) {
-        return RoomItems.get(index);
+    public Item get(int index) {
+        return items.get(index);
     }
 
     // index 위치의 키 값을 리턴
@@ -34,21 +35,21 @@ public class RoomItemList {
     public int remove(String key) {
         int index = findIndex(key);
         keys.remove(index);
-        RoomItems.remove(index);
+        items.remove(index);
         return index;
     }
 
     // key 값과 Item 객체를 목록에 추가
-    public int add(String key, RoomItem roomItem) {
+    public int add(String key, Item item) {
         keys.add(key);
-        RoomItems.add(roomItem);
-        return RoomItems.size() - 1;
+        items.add(item);
+        return items.size() - 1;
     }
 
     // key 값에 해당하는 Item 객체 변경
-    public int update(String key, RoomItem roomItem) {
+    public int update(String key, Item item) {
         int index = findIndex(key);
-        RoomItems.set(index, roomItem);
+        items.set(index, item);
         return index;
     }
 }
