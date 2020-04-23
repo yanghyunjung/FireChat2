@@ -48,7 +48,8 @@ public class RoomMemberLocationRecyclerViewAdapter extends RecyclerView.Adapter<
             Intent intent = new Intent();
             intent.setAction(Intent.ACTION_VIEW);
             intent.setPackage("com.google.android.apps.maps");
-            String data = "geo:"+roomMemberLocationItem.getLatitude()+", "+roomMemberLocationItem.getLongitude();
+            //String data = "geo:"+roomMemberLocationItem.getLatitude()+", "+roomMemberLocationItem.getLongitude();
+            String data = locationDataStr(roomMemberLocationItem.getLatitude(), roomMemberLocationItem.getLongitude());
             intent.setData(Uri.parse(data));
             activity.startActivity(intent);
         }
@@ -95,5 +96,9 @@ public class RoomMemberLocationRecyclerViewAdapter extends RecyclerView.Adapter<
     @Override
     public int getItemViewType(int position) {
         return ROOM_MEMBER_LOCATION;
+    }
+
+    public static String locationDataStr(double latitude, double longitude){
+        return "geo:"+latitude+", "+longitude;
     }
 }

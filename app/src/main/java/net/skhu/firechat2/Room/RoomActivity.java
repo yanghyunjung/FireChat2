@@ -208,6 +208,25 @@ public class RoomActivity extends AppCompatActivity {
 
     }
 
+    // 리사이클러뷰 초기화 작업
+    private void initRecyclerViewRoomMemberLocationList() {
+        roomMemberLocationItemList = new RoomMemberLocationItemList(); // 데이터 목록 객체 생성
+
+        /*// 리사이클러 뷰 설정
+        roomMemberLocationRecyclerViewAdapter = new RoomMemberLocationRecyclerViewAdapter(this, roomMemberLocationItemList);
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewRoomMemberLocationList);
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(roomMemberLocationRecyclerViewAdapter);*/
+
+        // firebase DB 서비스 생성
+        //FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        //String userId = (user != null) ? user.getUid() : "anonymous";
+        firebaseDbServiceForRoomMemberLocationList = new FirebaseDbServiceForRoomMemberLocationList(this,
+                null, roomMemberLocationItemList, null, roomKey);
+    }
+
     public void initCheckBoxScroll(){
         checkedFreeScroll = new BooleanCommunication(false);//스크롤을 자유 해제를 default로 해주었습니다.
 
@@ -254,6 +273,10 @@ public class RoomActivity extends AppCompatActivity {
         musicPreviewDialog.show(getSupportFragmentManager(), "EditDialog"); // 화면에 대화상자 보이기
     }
 
+    public static String locationDataStr(double latitude, double longitude){
+        return "geo:"+latitude+", "+longitude;
+    }
+
 
     //////////////////////////////////////////////////////////////////
 
@@ -295,14 +318,6 @@ public class RoomActivity extends AppCompatActivity {
             Intent intent = new Intent(this, MusicUploadActivity.class);
             startActivityForResult(intent, DOWNLOAD_MUSIC);
         }
-        else if (id == R.id.action_showRoomMember) {
-
-            /*Intent intent = new Intent(this, RoomMemberListActivity.class);
-            intent.putExtra("roomKey", roomKey);
-            intent.putExtra("userName", userName);
-            intent.putExtra("userEmail", userEmail);
-            startActivityForResult(intent, SHOW_ROOM_MEMBER);*/
-        }
         else if (id == R.id.action_showMemberLocation) {
 
             Intent intent = new Intent(this, RoomMemberLocationListActivity.class);
@@ -310,6 +325,27 @@ public class RoomActivity extends AppCompatActivity {
             intent.putExtra("userName", userName);
             intent.putExtra("userEmail", userEmail);
             startActivityForResult(intent, SHOW_ROOM_MEMBER_LOCATION);
+        }
+        else if (id == R.id.action_showMidpoint) {
+
+            firebaseDbServiceForRoomMemberLocationList.updateInServerAll();
+
+            double midpointLatitude = 0;
+            double midpointLongitude = 0;
+
+            for (int i = 0; i < roomMemberLocationItemList.size(); i++) {
+                midpointLatitude += roomMemberLocationItemList.get(i).getLatitude();
+                midpointLongitude += roomMemberLocationItemList.get(i).getLongitude();
+            }
+            midpointLatitude = midpointLatitude/roomMemberLocationItemList.size();
+            midpointLongitude = midpointLongitude/roomMemberLocationItemList.size();
+
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            intent.setPackage("com.google.android.apps.maps");
+            //String data = "geo:"+midpointLatitude+", "+midpointLongitude;
+            intent.setData(Uri.parse(locationDataStr(midpointLatitude, midpointLongitude)));
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(menuItem);
@@ -706,22 +742,5 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
-    // 리사이클러뷰 초기화 작업
-    private void initRecyclerViewRoomMemberLocationList() {
-        roomMemberLocationItemList = new RoomMemberLocationItemList(); // 데이터 목록 객체 생성
 
-        /*// 리사이클러 뷰 설정
-        roomMemberLocationRecyclerViewAdapter = new RoomMemberLocationRecyclerViewAdapter(this, roomMemberLocationItemList);
-        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewRoomMemberLocationList);
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(roomMemberLocationRecyclerViewAdapter);*/
-
-        // firebase DB 서비스 생성
-        //FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        //String userId = (user != null) ? user.getUid() : "anonymous";
-        firebaseDbServiceForRoomMemberLocationList = new FirebaseDbServiceForRoomMemberLocationList(this,
-                null, roomMemberLocationItemList, null, roomKey);
-    }
 }

@@ -34,12 +34,12 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_showRoomMember"
-        android:title="@string/action_showRoomMember"
+        android:id="@+id/action_showMemberLocation"
+        android:title="@string/action_showMemberLocation"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_showMemberLocation"
-        android:title="@string/action_showMemberLocation"
+        android:id="@+id/action_showMidpoint"
+        android:title="@string/action_showMidpoint"
         app:showAsAction="ifRoom" />
 </menu>

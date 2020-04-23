@@ -101,6 +101,28 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
         databaseReference.child(roomKey).child("RoomMemberLocationList").child(key).setValue(roomMemberLocationItem);
     }
 
+    public void updateInServerAll() {
+        // 서버에서 데이터를 update 한다.
+        for (int i = 0; i < roomMemberLocationItemList.size(); i++) {
+            String key = roomMemberLocationItemList.getKey(i);
+            RoomMemberLocationItem roomMemberLocationItem = roomMemberLocationItemList.get(i);
+
+            if (userKey == key) {//해당 사용자에게 위치 upodate요청이 오면 현제 위치를 roomMemberLocationItem에 저장해서 upodate시키도록 했습니다.
+                gpsTracker = new GpsTracker(context);
+
+                double latitude = gpsTracker.getLatitude();
+                double longitude = gpsTracker.getLongitude();
+                if (roomMemberLocationItem.getLatitude() != latitude &&
+                        roomMemberLocationItem.getLongitude() != longitude) {
+                    roomMemberLocationItem.setLatitude(latitude);
+                    roomMemberLocationItem.setLongitude(longitude);
+                }
+            }
+
+            databaseReference.child(roomKey).child("RoomMemberLocationList").child(key).setValue(roomMemberLocationItem);
+        }
+    }
+
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
         // DB에 새 데이터 항목이 등록되었을 때, 이 메소드가 자동으로 호출된다.
