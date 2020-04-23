@@ -95,6 +95,9 @@ public class FirebaseDbServiceForRoom implements ChildEventListener {
 
 
         roomRecyclerViewAdapter.notifyItemInserted(index); // RecyclerView를 다시 그린다.
+        roomRecyclerViewAdapter.notifyDataSetChanged();
+
+
 
         if (checkedFreeScroll != null) {
             if (!checkedFreeScroll.getBoolean()) {
@@ -112,6 +115,7 @@ public class FirebaseDbServiceForRoom implements ChildEventListener {
         int index = roomItemList.update(key, RoomItem);  // 수정된 데이터를 itemList에 대입한다.
         // 전에 key 값으로 등록되었던 데이터가  덮어써진다. (overwrite)
         roomRecyclerViewAdapter.notifyItemChanged(index); // RecyclerView를 다시 그린다.
+        roomRecyclerViewAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -121,6 +125,7 @@ public class FirebaseDbServiceForRoom implements ChildEventListener {
         String key = dataSnapshot.getKey(); // 삭제된 데이터 항목의 키 값을 꺼낸다.
         int index = roomItemList.remove(key); // itemList에서 그 데이터 항목을 삭제한다.
         roomRecyclerViewAdapter.notifyItemRemoved(index); // RecyclerView를 다시 그린다.
+        roomRecyclerViewAdapter.notifyDataSetChanged();
     }
 
     @Override

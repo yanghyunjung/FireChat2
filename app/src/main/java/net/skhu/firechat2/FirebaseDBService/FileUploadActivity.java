@@ -142,11 +142,13 @@ public class FileUploadActivity extends AppCompatActivity {
                             Cursor cursor = getContentResolver().query(filePath, projection, null, null, null);
 
                             if (cursor == null || !cursor.moveToFirst()) {
-                                Log.e("TAG", "cursor null or cursor is empty");
+                                Log.e("pjw", "cursor null or cursor is empty");
                             }
                             else {
                                 do {
                                     String contentUrl = filePath.toString() + "/" + cursor.getString(0);
+
+                                    Log.v("pjw", "contentUrl" + contentUrl);
 
                                     path = getFilesDir();
 

@@ -30,8 +30,9 @@ public class MusicPreviewDialog extends DialogFragment {
         builder.setTitle("음악 재생"); // 대화 상자의 제목 설정하기
 
         // 대화 상자에 표시될 뷰 객체들을 자동으로 생성함.
-        final View rootView = activity.getLayoutInflater().inflate(R.layout.item_music_preview, null);
+        final View rootView = activity.getLayoutInflater().inflate(R.layout.music_preview_dialog, null);
         final ImageView imageViewMusicStart = (ImageView)rootView.findViewById(R.id.imageViewMusicStart);
+        //final Button buttonMusicDownload = (Button)rootView.findViewById(R.id.buttonMusicDownload);
 
         imageViewMusicStart.setOnClickListener(new View.OnClickListener() {
             @Override

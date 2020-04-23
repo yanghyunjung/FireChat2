@@ -3,13 +3,11 @@ package net.skhu.firechat2.FirebaseDBService;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.MediaController;
@@ -31,10 +29,6 @@ import com.google.firebase.storage.UploadTask;
 import net.skhu.firechat2.R;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -100,7 +94,7 @@ public class VideoUploadActivity extends AppCompatActivity {
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
                 pickIntent.setType("video/*");
                 startActivityForResult(pickIntent, VIDEO);
 
@@ -115,9 +109,10 @@ public class VideoUploadActivity extends AppCompatActivity {
         });
 
         btnStart.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View arg0) {
-                playVideo();
+               playVideo();
             }
         });
 
@@ -196,59 +191,67 @@ public class VideoUploadActivity extends AppCompatActivity {
                             progressDialog.dismiss(); //업로드 진행 Dialog 상자 닫기
                             Toast.makeText(getApplicationContext(), "업로드 완료!", Toast.LENGTH_SHORT).show();
 
-                            try {
-                                path = getFilesDir();
+                            /*
+                           // Uri externalUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                            String[] projection = new String[]{
+                                    MediaStore.Video.Media._ID,
+                                    MediaStore.Video.Media.DISPLAY_NAME,
+                                    MediaStore.Video.Media.MIME_TYPE
+                            };
 
-                                //저장하는 파일의 이름
-                                final File file = new File(path, filename);
+                            Cursor cursor = getContentResolver().query(filePath, projection, null, null, null);
 
-                                file.createNewFile();
+                            if (cursor == null || !cursor.moveToFirst()) {
+                                Log.e("pjw", "cursor null or cursor is empty");
+                            }
+                            else {
+                                do {
+                                    String contentUrl = filePath.toString() + "/" + cursor.getString(0);
+                                    Log.v("pjw", "contentUrl: " + contentUrl);
 
-                                Cursor cursor = getContentResolver().query(filePath, null, null, null);
-                                cursor.moveToNext();
-                                String pathStr = cursor.getString(cursor.getColumnIndex("_data"));
-                                cursor.close();
+                                    path = getFilesDir();
 
-                                final File originalFile = new File(pathStr);
+                                    //저장하는 파일의 이름
+                                    final File file = new File(path, filename);
 
-                                String downloadVideoName = filename;
-
-                                Log.v("pjw", "\noriginalFile Path " + originalFile.toString());
-                                Log.v("pjw", "\nfile Path " + file.toString());
-
-                                try {
-
-                                    FileInputStream inputStream = new FileInputStream(originalFile);
-
-                                    FileOutputStream outputStream = new FileOutputStream(file);
-
-                                    int bytesRead = 0;
-
-                                    byte[] buffer = new byte[1024];
-
-                                    while ((bytesRead = inputStream.read(buffer, 0, 1024)) != -1) {
-                                        outputStream.write(buffer, 0, bytesRead);
+                                    try {
+                                        file.createNewFile();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
                                     }
 
-                                    outputStream.close();
+                                    try {
 
-                                    inputStream.close();
+                                        FileInputStream inputStream = new FileInputStream(contentUrl);
 
-                                } catch (FileNotFoundException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                } catch (IOException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
-                            }
-                            catch (FileNotFoundException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
+                                        FileOutputStream outputStream = new FileOutputStream(file);
+
+                                        int bytesRead = 0;
+
+                                        byte[] buffer = new byte[1024];
+
+                                        while ((bytesRead = inputStream.read(buffer, 0, 1024)) != -1) {
+                                            outputStream.write(buffer, 0, bytesRead);
+                                        }
+
+                                        outputStream.close();
+
+                                        inputStream.close();
+
+                                    } catch (FileNotFoundException e) {
+                                        // TODO Auto-generated catch block
+                                        e.printStackTrace();
+                                    } catch (IOException e) {
+                                        // TODO Auto-generated catch block
+                                        e.printStackTrace();
+                                    }
+
+                                    Log.v("pjw", "\nfile Path " + file.toString());
+
+                                } while (cursor.moveToNext());
+                            }*/
+
+
 
                             Intent intent = new Intent();
                             intent.putExtra("downloadVideoFileName", filename);
@@ -281,5 +284,6 @@ public class VideoUploadActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "파일을 먼저 선택하세요.", Toast.LENGTH_SHORT).show();
         }
     }
+
 
 }

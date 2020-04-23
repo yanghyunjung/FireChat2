@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -30,10 +29,6 @@ import com.google.firebase.storage.UploadTask;
 import net.skhu.firechat2.R;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -208,7 +203,7 @@ public class MusicUploadActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "업로드 완료!", Toast.LENGTH_SHORT).show();
 
 
-                            try {
+                            /*try {
                                 path = getFilesDir();
 
                                 //저장하는 파일의 이름
@@ -261,7 +256,7 @@ public class MusicUploadActivity extends AppCompatActivity {
                             } catch (IOException e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
-                            }
+                            }*/
 
 
                             Intent intent = new Intent();

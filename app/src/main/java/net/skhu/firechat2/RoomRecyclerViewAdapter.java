@@ -35,11 +35,19 @@ public class RoomRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         @Override
         public void onClick(View view) {
             MainActivity activity = (MainActivity)view.getContext();
+           /* activity.firebaseDbServiceForRoomMemberList = new FirebaseDbServiceForRoomMemberList(null, null, activity.roomMemberItemList, null, roomItemList.getKey(super.getAdapterPosition()));
 
+            RoomMemberItem roomMemberItem = new RoomMemberItem();
+            roomMemberItem.setUserName(activity.userName);
+            roomMemberItem.setUserEmail(activity.userEmail);
+            activity.firebaseDbServiceForRoomMemberList.addIntoServer(roomMemberItem);*/
+
+            //방으로 들어가는 Intent
             Intent intent = new Intent(activity, RoomActivity.class);
             intent.putExtra("RoomKey", roomItemList.getKey(super.getAdapterPosition()));
             intent.putExtra("userName", activity.userName);
             intent.putExtra("RoomName", roomItemList.get(super.getAdapterPosition()).getRoomName());
+            intent.putExtra("userEmail", activity.userEmail);
             activity.startActivityForResult(intent, activity.ROOM);
         }
     }

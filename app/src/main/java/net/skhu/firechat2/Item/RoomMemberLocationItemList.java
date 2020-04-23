@@ -3,13 +3,13 @@ package net.skhu.firechat2.Item;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RoomItemList {
+public class RoomMemberLocationItemList {
     List<String> keys = new ArrayList<String>();
-    List<RoomItem> roomItems = new ArrayList<RoomItem>();
+    List<RoomMemberLocationItem> roomMemberLocationItems = new ArrayList<RoomMemberLocationItem>();
 
     // index 위치의 Item 객체를 리턴
-    public RoomItem get(int index) {
-        return roomItems.get(index);
+    public RoomMemberLocationItem get(int index) {
+        return roomMemberLocationItems.get(index);
     }
 
     // index 위치의 키 값을 리턴
@@ -34,21 +34,21 @@ public class RoomItemList {
     public int remove(String key) {
         int index = findIndex(key);
         keys.remove(index);
-        roomItems.remove(index);
+        roomMemberLocationItems.remove(index);
         return index;
     }
 
     // key 값과 Item 객체를 목록에 추가
-    public int add(String key, RoomItem roomItem) {
+    public int add(String key, RoomMemberLocationItem roomMemberLocationItem) {
         keys.add(key);
-        roomItems.add(roomItem);
-        return roomItems.size() - 1;
+        roomMemberLocationItems.add(roomMemberLocationItem);
+        return roomMemberLocationItems.size() - 1;
     }
 
     // key 값에 해당하는 Item 객체 변경
-    public int update(String key, RoomItem roomItem) {
+    public int update(String key, RoomMemberLocationItem roomMemberLocationItem) {
         int index = findIndex(key);
-        roomItems.set(index, roomItem);
+        roomMemberLocationItems.set(index, roomMemberLocationItem);
         return index;
     }
 }

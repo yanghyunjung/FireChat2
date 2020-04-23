@@ -32,4 +32,14 @@
         android:id="@+id/action_musicUpload"
         android:title="@string/action_musicUpload"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_showRoomMember"
+        android:title="@string/action_showRoomMember"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_showMemberLocation"
+        android:title="@string/action_showMemberLocation"
+        app:showAsAction="ifRoom" />
 </menu>
