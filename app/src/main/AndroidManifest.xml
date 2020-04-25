@@ -15,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Room.MemberLocation.RoomMemberLocationListActivity"></activity>
+        <activity android:name=".FirebaseDBService.PhotoUploadActivity"></activity>
+        <activity android:name=".Room.MemberLocation.RoomMemberLocationListActivity" />
         <activity android:name=".Room.Member.RoomMemberListActivity" />
         <activity android:name=".FirebaseDBService.MusicUploadActivity" />
         <activity android:name=".Room.RoomActivity" />
