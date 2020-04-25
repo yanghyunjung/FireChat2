@@ -41,17 +41,32 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
 
     int selectPhotoIndex;
 
+    String RoomMemberLocationList;
+
     String userKey;
+
+    //String RoomMemberLocationListKey;
 
     private GpsTracker gpsTracker;
 
-    public FirebaseDbServiceForRoomMemberLocationList(Context context, RoomMemberLocationRecyclerViewAdapter roomMemberLocationRecyclerViewAdapter, RoomMemberLocationItemList roomMemberLocationItemList, RecyclerView recyclerView, String roomKey) {
+    String roomName;
+
+    public FirebaseDbServiceForRoomMemberLocationList(Context context, RoomMemberLocationRecyclerViewAdapter roomMemberLocationRecyclerViewAdapter, RoomMemberLocationItemList roomMemberLocationItemList, RecyclerView recyclerView, String roomKey, String roomName) {
         this.roomMemberLocationRecyclerViewAdapter = roomMemberLocationRecyclerViewAdapter;
         this.roomMemberLocationItemList = roomMemberLocationItemList; // RecyclerView에 표시할 데이터 목록
         //this.userId = userId;
         this.recyclerView = recyclerView;
+        this.roomName=roomName;
+
+        RoomMemberLocationList = "RoomMemberLocationList";
+        if (this.roomName.equals("RoomMemberLocationList")){
+            RoomMemberLocationList = "RoomMemberLocationList1";
+        }
+
         databaseReference = FirebaseDatabase.getInstance().getReference("myServerData04");
-        databaseReference.child(roomKey).child("RoomMemberLocationList").addChildEventListener(this);
+        //RoomMemberLocationListKey = databaseReference.child(roomKey).push().getKey();
+
+        databaseReference.child(roomKey).child(RoomMemberLocationList).addChildEventListener(this);
         this.context = context;
         this.roomKey = roomKey;
         //this.roomName = roomName;
@@ -61,23 +76,23 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
     //데이터 베이스에 추가할 때
     public void addIntoServer(RoomMemberLocationItem roomMemberLocationItem) {
         // 새 기본 키(primary key)를 생성한다.
-        String key = databaseReference.child(roomKey).child("RoomMemberLocationList").push().getKey();
+        String key = databaseReference.child(roomKey).child(RoomMemberLocationList).push().getKey();
         userKey = key;
         // 새 기본 키로 데이터를 등록한다.
         // 서버에서 key 값으로 dataItem 값이 새로 등록된다.
-        databaseReference.child(roomKey).child("RoomMemberLocationList").child(key).setValue(roomMemberLocationItem);
+        databaseReference.child(roomKey).child(RoomMemberLocationList).child(key).setValue(roomMemberLocationItem);
     }
 
     public void removeFromServer(String key) {
         // 서버에서 데이터를 delete 한다.
         // 서버에서 key 값으로 등록된 데이터가 제거된다.
-        databaseReference.child(roomKey).child("RoomMemberLocationList").child(key).removeValue();
+        databaseReference.child(roomKey).child(RoomMemberLocationList).child(key).removeValue();
     }
 
     public void removeAllFromServer(){
         for (int i = 0; i < roomMemberLocationItemList.size(); i++){
             String key = roomMemberLocationItemList.getKey(i);
-            databaseReference.child(roomKey).child("RoomMemberLocationList").child(key).removeValue();
+            databaseReference.child(roomKey).child(RoomMemberLocationList).child(key).removeValue();
         }
     }
 
@@ -98,7 +113,7 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
             }
         }
 
-        databaseReference.child(roomKey).child("RoomMemberLocationList").child(key).setValue(roomMemberLocationItem);
+        databaseReference.child(roomKey).child(RoomMemberLocationList).child(key).setValue(roomMemberLocationItem);
     }
 
     public void updateInServerAll() {
@@ -119,7 +134,7 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
                 }
             }
 
-            databaseReference.child(roomKey).child("RoomMemberLocationList").child(key).setValue(roomMemberLocationItem);
+            databaseReference.child(roomKey).child(RoomMemberLocationList).child(key).setValue(roomMemberLocationItem);
         }
     }
 

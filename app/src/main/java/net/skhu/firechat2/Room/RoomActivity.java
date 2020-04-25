@@ -224,7 +224,7 @@ public class RoomActivity extends AppCompatActivity {
         //FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         //String userId = (user != null) ? user.getUid() : "anonymous";
         firebaseDbServiceForRoomMemberLocationList = new FirebaseDbServiceForRoomMemberLocationList(this,
-                null, roomMemberLocationItemList, null, roomKey);
+                null, roomMemberLocationItemList, null, roomKey, roomName);
     }
 
     public void initCheckBoxScroll(){
@@ -324,6 +324,7 @@ public class RoomActivity extends AppCompatActivity {
             intent.putExtra("roomKey", roomKey);
             intent.putExtra("userName", userName);
             intent.putExtra("userEmail", userEmail);
+            intent.putExtra("roomName", roomName);
             startActivityForResult(intent, SHOW_ROOM_MEMBER_LOCATION);
         }
         else if (id == R.id.action_showMidpoint) {

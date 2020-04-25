@@ -38,6 +38,7 @@ public class RoomMemberLocationListActivity extends AppCompatActivity {
     String roomKey;
     String userEmail;
     String userName;
+    String roomName;
 
     private GpsTracker gpsTracker;
 
@@ -58,6 +59,7 @@ public class RoomMemberLocationListActivity extends AppCompatActivity {
             roomKey = extras.getString("roomKey");
             userEmail = extras.getString("userEmail");
             userName = extras.getString("userName");
+            roomName = extras.getString("roomName");
         }
 
         initRecyclerViewRoomMemberLocationList();
@@ -80,7 +82,7 @@ public class RoomMemberLocationListActivity extends AppCompatActivity {
         //FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         //String userId = (user != null) ? user.getUid() : "anonymous";
         firebaseDbServiceForRoomMemberLocationList = new FirebaseDbServiceForRoomMemberLocationList(this,
-                roomMemberLocationRecyclerViewAdapter, roomMemberLocationItemList, recyclerView, roomKey);
+                roomMemberLocationRecyclerViewAdapter, roomMemberLocationItemList, recyclerView, roomKey, roomName);
     }
 
     /*

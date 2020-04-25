@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
+    //String CanNotCreateRoomName = "RoomMemberLocationList1932847";//파이어 베이스 구조에서 RoomMemberLocationList1932847를 문자열로 쓸 수 없도록 해서, 일단 이 문자열로 방을 생성하지 못 하도록 했다.
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         userName = "anonymous";
+
+        //CanNotCreateRoomName = "RoomMemberLocationList1932847";
 
         mContext = this;
 
