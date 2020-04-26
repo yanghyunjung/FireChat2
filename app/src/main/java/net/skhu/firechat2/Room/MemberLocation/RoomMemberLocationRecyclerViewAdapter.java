@@ -39,9 +39,22 @@ public class RoomMemberLocationRecyclerViewAdapter extends RecyclerView.Adapter<
         public void onClick(View view) {
             RoomMemberLocationListActivity activity = (RoomMemberLocationListActivity)view.getContext();
 
-            activity.firebaseDbServiceForRoomMemberLocationList.updateInServer(super.getAdapterPosition());
+            activity.firebaseDbServiceForRoomMemberLocationList.updateInServer(super.getAdapterPosition());//상대 방에게 업데이트 요청
 
-            RoomMemberLocationItem roomMemberLocationItem = activity.roomMemberLocationItemList.get(super.getAdapterPosition());
+            //추후에 firebase update할 때 listener 걸어 두어서 정확한 타이밍에 업데이트 받을 수 있게 구현
+
+            //업데이트까지 지연시간.
+            try {
+
+                Thread.sleep(500); //0.5초 대기
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+
+            RoomMemberLocationItem roomMemberLocationItem = activity.roomMemberLocationItemList.get(super.getAdapterPosition());//업데이트 받은 것 저장
 
             Toast.makeText(activity.getApplicationContext(), "현재위치 \n위도 " + roomMemberLocationItem.getLatitude() + "\n경도 " + roomMemberLocationItem.getLongitude(), Toast.LENGTH_SHORT).show();
 
