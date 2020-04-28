@@ -42,12 +42,15 @@ public class RoomRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             roomMemberItem.setUserEmail(activity.userEmail);
             activity.firebaseDbServiceForRoomMemberList.addIntoServer(roomMemberItem);*/
 
+
             //방으로 들어가는 Intent
             Intent intent = new Intent(activity, RoomActivity.class);
-            intent.putExtra("RoomKey", roomItemList.getKey(super.getAdapterPosition()));
+            intent.putExtra("roomKey", roomItemList.getKey(super.getAdapterPosition()));
             intent.putExtra("userName", activity.userName);
-            intent.putExtra("RoomName", roomItemList.get(super.getAdapterPosition()).getRoomName());
+            intent.putExtra("roomName", roomItemList.get(super.getAdapterPosition()).getRoomName());
             intent.putExtra("userEmail", activity.userEmail);
+            intent.putExtra("roomMemberLocationKey", roomItemList.get(super.getAdapterPosition()).getRoomMemberLocationKey());
+
             activity.startActivityForResult(intent, activity.ROOM);
         }
     }

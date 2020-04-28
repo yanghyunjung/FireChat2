@@ -55,8 +55,15 @@ public class FirebaseDbServiceForRoom implements ChildEventListener {
         Log.v("pjw", "\n 데이터 베이스 추가");
         String key = databaseReference.push().getKey();
         // 새 기본 키로 데이터를 등록한다.
+
+        roomItem.setRoomMemberLocationKey(receiveRoomMemberLocationKey(key));//roomItem 안에 RoomMemberLocationKey 값을 저장했습니다. 데이터 베이스에서 활용하기 client 모두에게 공유하는 용도로 사용할 것이기 때문입니다.
+
         // 서버에서 key 값으로 dataItem 값이 새로 등록된다.
         databaseReference.child(key).setValue(roomItem);
+    }
+
+    public String receiveRoomMemberLocationKey(String roomKey){
+        return databaseReference.child(roomKey).push().getKey();
     }
 
     public void removeFromServer(String key) {
