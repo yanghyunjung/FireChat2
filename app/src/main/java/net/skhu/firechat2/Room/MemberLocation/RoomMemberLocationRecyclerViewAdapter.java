@@ -55,7 +55,7 @@ public class RoomMemberLocationRecyclerViewAdapter extends RecyclerView.Adapter<
             }
 
             //추가적으로 한 번 더 확인해주었습니다. "지금은 시간 지연을 위해 사용한 것입니다."
-            activity.firebaseDbServiceForRoomMemberLocationList.updateInServer(super.getAdapterPosition());//상대 방에게 업데이트 요청.
+            //activity.firebaseDbServiceForRoomMemberLocationList.updateInServer(super.getAdapterPosition());//상대 방에게 업데이트 요청.
 
 
             RoomMemberLocationItem roomMemberLocationItem = activity.roomMemberLocationItemList.get(super.getAdapterPosition());//업데이트 받은 것 저장
