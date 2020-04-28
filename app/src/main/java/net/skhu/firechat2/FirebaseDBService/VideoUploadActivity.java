@@ -35,7 +35,8 @@ import java.util.Date;
 public class VideoUploadActivity extends AppCompatActivity {
 
     VideoView videoView;
-    Button btnStart, btnStop, btnSearch, btnUploadVideo;
+    //Button btnStart, btnStop;
+    Button btnSearch, btnUploadVideo;
 
     final int VIDEO = 1;
 
@@ -58,8 +59,8 @@ public class VideoUploadActivity extends AppCompatActivity {
 
         //레이아웃 위젯 findViewById
         videoView = (VideoView) findViewById(R.id.view);
-        btnStart = (Button) findViewById(R.id.btnStart);
-        btnStop = (Button) findViewById(R.id.btnStop);
+        //btnStart = (Button) findViewById(R.id.btnStart);
+        //btnStop = (Button) findViewById(R.id.btnStop);
         btnSearch = (Button) findViewById(R.id.btnSearch);
         btnUploadVideo = (Button)findViewById(R.id.btnUploadVideo);
 
@@ -108,7 +109,7 @@ public class VideoUploadActivity extends AppCompatActivity {
             }
         });
 
-        btnStart.setOnClickListener(new View.OnClickListener() {
+        /*btnStart.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View arg0) {
@@ -121,7 +122,7 @@ public class VideoUploadActivity extends AppCompatActivity {
             public void onClick(View arg0) {
                 stopVideo();
             }
-        });
+        });*/
     }
 
     //동영상 재생 Method
