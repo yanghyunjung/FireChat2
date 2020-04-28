@@ -1,8 +1,9 @@
 package net.skhu.firechat2.Item;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Item {
+public class Item implements Serializable {
     String message;
     String userName;
     Date createTime;

@@ -179,16 +179,19 @@ public class VideoPreview extends AppCompatActivity {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); //가로모드 고정
             horizontalMode = true;
             invalidateOptionsMenu(); // 메뉴를 상태를 변경해야 함
+            return true;
         }
         else if (id == R.id.action_verticalMode){
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); //세로모드 고정
             horizontalMode = false;
             invalidateOptionsMenu(); // 메뉴를 상태를 변경해야 함
+            return true;
         }
         else if (id == R.id.action_fullScreen){
             actionBar = getSupportActionBar();
             actionBar.hide();
             actionShow = false;
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

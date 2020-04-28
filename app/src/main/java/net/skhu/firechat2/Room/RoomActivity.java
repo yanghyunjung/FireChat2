@@ -296,10 +296,13 @@ public class RoomActivity extends AppCompatActivity {
         int id = menuItem.getItemId();
         if (id == R.id.action_rename) {
             this.showRenameDialog();
+            return true;
         } else if (id == R.id.action_removeAll) {
             firebaseDbService.removeAllFromServer();
+            return true;
         } else if (id == R.id.scroll) {
             this.showScrollDialog();
+            return true;
         } else if (id == R.id.action_photoUpload) {
             Intent intent = new Intent(this, PhotoUploadActivity.class);
             startActivityForResult(intent, DOWNLOAD_PHOTO);
@@ -307,6 +310,7 @@ public class RoomActivity extends AppCompatActivity {
         } else if (id == R.id.action_videoUpload) {
             Intent intent = new Intent(this, VideoUploadActivity.class);
             startActivityForResult(intent, DOWNLOAD_VIDEO);
+            return true;
         }
         else if (id == R.id.action_closeRoom) {
             firebaseDbService.removeAllFromServer();
@@ -315,10 +319,14 @@ public class RoomActivity extends AppCompatActivity {
             intent.putExtra("roomKey", roomKey);
             setResult(Activity.RESULT_OK, intent);
             finish();
+
+            return true;
         }
         else if (id == R.id.action_musicUpload) {
             Intent intent = new Intent(this, MusicUploadActivity.class);
             startActivityForResult(intent, DOWNLOAD_MUSIC);
+
+            return true;
         }
         else if (id == R.id.action_showMemberLocation) {
 
@@ -329,6 +337,8 @@ public class RoomActivity extends AppCompatActivity {
             intent.putExtra("roomName", roomName);
             intent.putExtra("roomMemberLocationKey", roomMemberLocationKey);
             startActivityForResult(intent, SHOW_ROOM_MEMBER_LOCATION);
+
+            return true;
         }
         else if (id == R.id.action_showMidpoint) {
 
@@ -350,6 +360,8 @@ public class RoomActivity extends AppCompatActivity {
             //String data = "geo:"+midpointLatitude+", "+midpointLongitude;
             intent.setData(Uri.parse(locationDataStr(midpointLatitude, midpointLongitude)));
             startActivity(intent);
+
+            return true;
         }
 
         return super.onOptionsItemSelected(menuItem);

@@ -1,6 +1,8 @@
 package net.skhu.firechat2.Item;
 
-public class RoomMemberItem {
+import java.io.Serializable;
+
+public class RoomMemberItem implements Serializable {
     String userName;
     String userEmail;
     double latitude;

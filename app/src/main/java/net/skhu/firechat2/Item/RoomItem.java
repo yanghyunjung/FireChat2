@@ -1,6 +1,8 @@
 package net.skhu.firechat2.Item;
 
-public class RoomItem {
+import java.io.Serializable;
+
+public class RoomItem implements Serializable {
     String roomName;
     String roomMemberLocationKey;//roomName과 이름이 같으면 안되기에, key로 두었습니다.
     //String password;
