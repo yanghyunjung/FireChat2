@@ -1,10 +1,11 @@
 package net.skhu.firechat2.Item;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 // Item 객체의 목록과, firebase DB의 키(string) 목록을 관리하는 클래스
-public class ItemList {
+public class ItemList implements Serializable {//Serializable마킹 인터페이스, 이게 있어야, Activity끼리 객체를 전달할 수 있습니다.
     List<String> keys = new ArrayList<String>();
     List<Item> items = new ArrayList<Item>();
 
