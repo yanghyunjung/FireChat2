@@ -6,6 +6,7 @@ import java.util.Date;
 public class Item implements Serializable {//Serializable마킹 인터페이스, 이게 있어야, Activity끼리 객체를 전달할 수 있습니다.
     String message;
     String userName;
+    String userEmail;
     Date createTime;
     boolean checked;
 
@@ -82,6 +83,14 @@ public class Item implements Serializable {//Serializable마킹 인터페이스,
 
     public void setUserName(String userName){
         this.userName = userName;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 
     public String getMessage() {

@@ -31,7 +31,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -175,9 +174,9 @@ public class RoomActivity extends AppCompatActivity {
         itemList = new ItemList(); // 데이터 목록 객체 생성
 
         // 리사이클러 뷰 설정
-        myRecyclerViewAdapter = new MyRecyclerViewAdapter(this, itemList);
+        myRecyclerViewAdapter = new MyRecyclerViewAdapter(this, itemList, userEmail);
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        //recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(myRecyclerViewAdapter);
@@ -200,6 +199,7 @@ public class RoomActivity extends AppCompatActivity {
                     editText.setText("");
                     Item item = new Item(message);
                     item.setUserName(userName);
+                    item.setUserEmail(userEmail);
                     firebaseDbService.addIntoServer(item);
                 }
             }
@@ -579,6 +579,7 @@ public class RoomActivity extends AppCompatActivity {
 
                         Item item = new Item("동영상");
                         item.setUserName(userName);
+                        item.setUserEmail(userEmail);
                         item.setVideoFileName(downloadVideoFileName);
                         item.setHaveVideo(true);
                         firebaseDbService.addIntoServer(item);
@@ -611,6 +612,7 @@ public class RoomActivity extends AppCompatActivity {
 
                         Item item = new Item("음악");
                         item.setUserName(userName);
+                        item.setUserEmail(userEmail);
                         item.setMusicFileName(downloadMusicFileName);
                         item.setHaveMusic(true);
                         firebaseDbService.addIntoServer(item);
@@ -644,6 +646,7 @@ public class RoomActivity extends AppCompatActivity {
 
                         Item item = new Item("파일");
                         item.setUserName(userName);
+                        item.setUserEmail(userEmail);
                         item.setBinaryFileName(downloadBinaryFileName);
                         item.setRealBinaryFileName(realBinaryFileName);
                         item.setHaveBinaryFile(true);
@@ -693,6 +696,7 @@ public class RoomActivity extends AppCompatActivity {
                                     //Toast.makeText(MainActivity.this, file.getPath()+"다운로드 성공", Toast.LENGTH_LONG).show();
                                     Item item = new Item("사진");
                                     item.setUserName(userName);
+                                    item.setUserEmail(userEmail);
                                     item.setPhotoFileName(downloadPhotoName);
                                     item.setHavePhoto(true);
                                     firebaseDbService.addIntoServer(item);
