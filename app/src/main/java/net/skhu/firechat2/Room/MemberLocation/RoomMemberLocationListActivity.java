@@ -71,6 +71,8 @@ public class RoomMemberLocationListActivity extends AppCompatActivity {
             roomMemberLocationKey = extras.getString("roomMemberLocationKey");
         }
 
+        this.selectIndex=-1;
+
         initRecyclerViewRoomMemberLocationList();
 
     }
@@ -321,6 +323,7 @@ public class RoomMemberLocationListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        this.selectIndex = -1;//다시 앱으로 돌아왔을 때, 갑자기 지도로 넘어가지 않도록 하기 위함입니다.
         //t1.append( "재개\n");
     }
 
