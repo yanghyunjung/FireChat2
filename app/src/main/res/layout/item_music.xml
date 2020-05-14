@@ -38,7 +38,6 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="5dp"
         android:layout_marginRight="5dp"
-        android:gravity="right"
         android:text="TextView"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"

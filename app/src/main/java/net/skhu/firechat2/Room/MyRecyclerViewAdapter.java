@@ -26,6 +26,7 @@ import com.google.firebase.storage.StorageReference;
 
 import net.skhu.firechat2.Item.Item;
 import net.skhu.firechat2.Item.ItemList;
+import net.skhu.firechat2.ListenerInterface.OnItemClickListener;
 import net.skhu.firechat2.R;
 
 import java.io.File;
@@ -55,6 +56,8 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         public void onClick(View view) {
             RoomActivity activity = (RoomActivity)view.getContext();
             activity.showItemEditDialog(super.getAdapterPosition());
+
+            //onItemClickListener.OnItemClicked();
         }
     }
 
@@ -664,6 +667,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     ItemList itemList;
     Context context;
     String userEmail;
+    OnItemClickListener onItemClickListener;
 
     final int MESSAGE=0;
     final int PHOTO=1;
@@ -679,6 +683,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         this.context = context;
         this.itemList = itemList;
         this.userEmail=userEmail;
+        //this.onItemClickListener = onItemClickListener;
     }
 
     @Override

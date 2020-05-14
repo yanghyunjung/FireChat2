@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -22,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.skhu.firechat2.FirebaseDBService.FirebaseDbServiceForRoomMemberLocationList;
+import net.skhu.firechat2.Item.RoomMemberLocationItem;
 import net.skhu.firechat2.Item.RoomMemberLocationItemList;
 import net.skhu.firechat2.R;
 import net.skhu.firechat2.UnCatchTaskService;
@@ -31,6 +33,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class RoomMemberLocationListActivity extends AppCompatActivity {
+
+
     RoomMemberLocationItemList roomMemberLocationItemList;
     FirebaseDbServiceForRoomMemberLocationList firebaseDbServiceForRoomMemberLocationList;
     RoomMemberLocationRecyclerViewAdapter roomMemberLocationRecyclerViewAdapter;
@@ -47,6 +51,9 @@ public class RoomMemberLocationListActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
+    int selectIndex;
+
+    Thread locationUpdateThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +80,9 @@ public class RoomMemberLocationListActivity extends AppCompatActivity {
         roomMemberLocationItemList = new RoomMemberLocationItemList(); // 데이터 목록 객체 생성
 
         // 리사이클러 뷰 설정
-        roomMemberLocationRecyclerViewAdapter = new RoomMemberLocationRecyclerViewAdapter(this, roomMemberLocationItemList);
+        roomMemberLocationRecyclerViewAdapter = new RoomMemberLocationRecyclerViewAdapter(this, roomMemberLocationItemList,
+                (index)->intentMapInit(index));
+
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewRoomMemberLocationList);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -84,7 +93,8 @@ public class RoomMemberLocationListActivity extends AppCompatActivity {
         //FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         //String userId = (user != null) ? user.getUid() : "anonymous";
         firebaseDbServiceForRoomMemberLocationList = new FirebaseDbServiceForRoomMemberLocationList(this,
-                roomMemberLocationRecyclerViewAdapter, roomMemberLocationItemList, recyclerView, roomKey, roomName, roomMemberLocationKey);
+                roomMemberLocationRecyclerViewAdapter, roomMemberLocationItemList, recyclerView, roomKey, roomName, roomMemberLocationKey,
+                (index)->intentMap(index));
     }
 
     /*
@@ -272,6 +282,46 @@ public class RoomMemberLocationListActivity extends AppCompatActivity {
 
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    }
+
+    public void intentMapInit(int selectIndex){
+        this.selectIndex = selectIndex;
+
+        LocationIntentThread locationIntentThread = new LocationIntentThread(this, selectIndex);
+        Thread thread = new Thread(locationIntentThread, "locationIntentThread");
+        thread.start();
+    }
+
+    public void intentMap(int selectIndex){
+        if (this.selectIndex == selectIndex) {//사용자가 클릭한, index일 때, 구글 지도로 넘겨주도록 했습니다.
+            RoomMemberLocationItem roomMemberLocationItem = roomMemberLocationItemList.get(selectIndex);//업데이트 받은 것 저장
+
+            Log.v("pjw", "현재위치 \n위도 " + roomMemberLocationItem.getLatitude() + "\n경도 " + roomMemberLocationItem.getLongitude());
+
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            intent.setPackage("com.google.android.apps.maps");
+            //String data = "geo:"+roomMemberLocationItem.getLatitude()+", "+roomMemberLocationItem.getLongitude();
+            String data = locationDataStr(roomMemberLocationItem.getLatitude(), roomMemberLocationItem.getLongitude());
+            intent.setData(Uri.parse(data));
+            startActivity(intent);
+        }
+    }
+
+    public static String locationDataStr(double latitude, double longitude){
+        return "geo:"+latitude+", "+longitude;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //t1.append( "일시정지\n");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //t1.append( "재개\n");
     }
 
     @Override

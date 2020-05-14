@@ -13,6 +13,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import net.skhu.firechat2.Item.RoomMemberLocationItem;
 import net.skhu.firechat2.Item.RoomMemberLocationItemList;
+import net.skhu.firechat2.ListenerInterface.OnChildChangedLocation;
 import net.skhu.firechat2.Room.MemberLocation.GpsTracker;
 import net.skhu.firechat2.Room.MemberLocation.RoomMemberLocationRecyclerViewAdapter;
 
@@ -53,8 +54,11 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
 
     String roomMemberLocationKey;
 
+    OnChildChangedLocation onChildChangedLocation;
+
     public FirebaseDbServiceForRoomMemberLocationList(Context context, RoomMemberLocationRecyclerViewAdapter roomMemberLocationRecyclerViewAdapter,
-                                                      RoomMemberLocationItemList roomMemberLocationItemList, RecyclerView recyclerView, String roomKey, String roomName, String roomMemberLocationKey) {
+                                                      RoomMemberLocationItemList roomMemberLocationItemList, RecyclerView recyclerView, String roomKey, String roomName, String roomMemberLocationKey,
+                                                      OnChildChangedLocation onChildChangedLocation) {
         this.roomMemberLocationRecyclerViewAdapter = roomMemberLocationRecyclerViewAdapter;
         this.roomMemberLocationItemList = roomMemberLocationItemList; // RecyclerView에 표시할 데이터 목록
         //this.userId = userId;
@@ -73,8 +77,9 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
         databaseReference.child(roomKey).child(roomMemberLocationKey).child(RoomMemberLocationList).addChildEventListener(this);
         this.context = context;
         this.roomKey = roomKey;
-        //this.roomName = roomName;
 
+        this.onChildChangedLocation = onChildChangedLocation;
+        //this.roomName = roomName;
     }
 
     //데이터 베이스에 추가할 때
@@ -118,6 +123,22 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
         }
 
         databaseReference.child(roomKey).child(roomMemberLocationKey).child(RoomMemberLocationList).child(key).setValue(roomMemberLocationItem);
+    }
+
+    public void updateUserSelf(){
+        RoomMemberLocationItem roomMemberLocationItem = roomMemberLocationItemList.get(roomMemberLocationItemList.findIndex(userKey));
+
+        gpsTracker = new GpsTracker(context);
+
+        double latitude = gpsTracker.getLatitude();
+        double longitude = gpsTracker.getLongitude();
+        if (roomMemberLocationItem.getLatitude() != latitude &&
+                roomMemberLocationItem.getLongitude() != longitude) {
+            roomMemberLocationItem.setLatitude(latitude);
+            roomMemberLocationItem.setLongitude(longitude);
+        }
+
+        databaseReference.child(roomKey).child(roomMemberLocationKey).child(RoomMemberLocationList).child(userKey).setValue(roomMemberLocationItem);
     }
 
     public void updateInServerAll() {
@@ -180,6 +201,10 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
                     roomMemberLocationItemList.get(roomMemberLocationItemList.findIndex(userKey)).getLongitude() != longitude) {
                 updateInServer(roomMemberLocationItemList.findIndex(userKey));
             }
+        }
+
+        if(onChildChangedLocation != null) {
+            onChildChangedLocation.onChildChangedLocation(roomMemberLocationItemList.findIndex(key));
         }
 
         if (roomMemberLocationRecyclerViewAdapter != null) {

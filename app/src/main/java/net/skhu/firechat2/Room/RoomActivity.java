@@ -166,7 +166,12 @@ public class RoomActivity extends AppCompatActivity {
         roomMemberLocationItem.setLongitude(longitude);
         firebaseDbServiceForRoomMemberLocationList.addIntoServer(roomMemberLocationItem);
 
-        Toast.makeText(RoomActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
+        //Toast.makeText(RoomActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
+
+        LocationUpdateThread locationUpdateThread = new LocationUpdateThread(this);
+        Thread t = new Thread(locationUpdateThread,"locationUpdateThread");
+
+        t.start();
     }
 
     // 리사이클러뷰 초기화 작업
@@ -226,7 +231,8 @@ public class RoomActivity extends AppCompatActivity {
         //FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         //String userId = (user != null) ? user.getUid() : "anonymous";
         firebaseDbServiceForRoomMemberLocationList = new FirebaseDbServiceForRoomMemberLocationList(this,
-                null, roomMemberLocationItemList, null, roomKey, roomName, roomMemberLocationKey);
+                null, roomMemberLocationItemList, null, roomKey, roomName, roomMemberLocationKey,
+                null);
     }
 
     public void initCheckBoxScroll(){

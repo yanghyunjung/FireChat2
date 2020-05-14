@@ -3,17 +3,18 @@ package net.skhu.firechat2.Room.MemberLocation;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.skhu.firechat2.Item.RoomMemberLocationItem;
 import net.skhu.firechat2.Item.RoomMemberLocationItemList;
+import net.skhu.firechat2.ListenerInterface.OnClickRoomMemberLocation;
 import net.skhu.firechat2.R;
 
 public class RoomMemberLocationRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
@@ -41,10 +42,16 @@ public class RoomMemberLocationRecyclerViewAdapter extends RecyclerView.Adapter<
 
             activity.firebaseDbServiceForRoomMemberLocationList.updateInServer(super.getAdapterPosition());//상대 방에게 업데이트 요청
 
+            onClickRoomMemberLocation.onClickRoomMemberLocation(super.getAdapterPosition());
+
+            //LocationIntentThread locationIntentThread = new LocationIntentThread(view, super.getAdapterPosition());
+            //Thread thread = new Thread(locationIntentThread, "locationIntentThread");
+            //thread.start();
+
             //추후에 firebase update할 때 listener 걸어 두어서 정확한 타이밍에 업데이트 받을 수 있게 구현
 
             //업데이트까지 지연시간.
-            try {
+            /*try {
 
                 Thread.sleep(500); //0.5초 대기
 
@@ -54,13 +61,44 @@ public class RoomMemberLocationRecyclerViewAdapter extends RecyclerView.Adapter<
 
             }
 
-            //추가적으로 한 번 더 확인해주었습니다. "지금은 시간 지연을 위해 사용한 것입니다."
-            //activity.firebaseDbServiceForRoomMemberLocationList.updateInServer(super.getAdapterPosition());//상대 방에게 업데이트 요청.
-
 
             RoomMemberLocationItem roomMemberLocationItem = activity.roomMemberLocationItemList.get(super.getAdapterPosition());//업데이트 받은 것 저장
 
             Toast.makeText(activity.getApplicationContext(), "현재위치 \n위도 " + roomMemberLocationItem.getLatitude() + "\n경도 " + roomMemberLocationItem.getLongitude(), Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            intent.setPackage("com.google.android.apps.maps");
+            //String data = "geo:"+roomMemberLocationItem.getLatitude()+", "+roomMemberLocationItem.getLongitude();
+            String data = locationDataStr(roomMemberLocationItem.getLatitude(), roomMemberLocationItem.getLongitude());
+            intent.setData(Uri.parse(data));
+            activity.startActivity(intent);*/
+        }
+    }
+
+    //sleep을 사용하기 위해서 Thread를 사용해주었습니다.
+    class LocationIntentThread implements Runnable {
+        View view;
+        int selectIndex;
+        public LocationIntentThread(View view, int selectIndex) {
+            this.view = view;
+            this.selectIndex = selectIndex;
+        }
+
+        public void run() {
+            RoomMemberLocationListActivity activity = (RoomMemberLocationListActivity)view.getContext();
+
+            //업데이트까지 지연시간.
+            try {
+                Thread.sleep(500); //0.5초 대기
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+
+            RoomMemberLocationItem roomMemberLocationItem = activity.roomMemberLocationItemList.get(selectIndex);//업데이트 받은 것 저장
+
+            Log.v("pjw", "현재위치 \n위도 " + roomMemberLocationItem.getLatitude() + "\n경도 " + roomMemberLocationItem.getLongitude());
 
             Intent intent = new Intent();
             intent.setAction(Intent.ACTION_VIEW);
@@ -75,13 +113,15 @@ public class RoomMemberLocationRecyclerViewAdapter extends RecyclerView.Adapter<
     LayoutInflater layoutInflater;
     RoomMemberLocationItemList roomMemberLocationItemList;
     Context context;
+    OnClickRoomMemberLocation onClickRoomMemberLocation;
 
     final int ROOM_MEMBER_LOCATION=0;
 
-    public RoomMemberLocationRecyclerViewAdapter(Context context, RoomMemberLocationItemList roomMemberLocationItemList) {
+    public RoomMemberLocationRecyclerViewAdapter(Context context, RoomMemberLocationItemList roomMemberLocationItemList, OnClickRoomMemberLocation onClickRoomMemberLocation) {
         this.layoutInflater = LayoutInflater.from(context);
         this.context = context;
         this.roomMemberLocationItemList = roomMemberLocationItemList;
+        this.onClickRoomMemberLocation = onClickRoomMemberLocation;
     }
 
     @Override
@@ -119,3 +159,5 @@ public class RoomMemberLocationRecyclerViewAdapter extends RecyclerView.Adapter<
         return "geo:"+latitude+", "+longitude;
     }
 }
+
+
