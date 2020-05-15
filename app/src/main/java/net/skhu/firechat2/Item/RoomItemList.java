@@ -2,6 +2,7 @@ package net.skhu.firechat2.Item;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class RoomItemList implements Serializable {//Serializable마킹 인터페이스, 이게 있어야, Activity끼리 객체를 전달할 수 있습니다.
@@ -51,5 +52,9 @@ public class RoomItemList implements Serializable {//Serializable마킹 인터�
         int index = findIndex(key);
         roomItems.set(index, roomItem);
         return index;
+    }
+
+    public Iterator<String> getIteratorKeys(){
+        return keys.iterator();
     }
 }

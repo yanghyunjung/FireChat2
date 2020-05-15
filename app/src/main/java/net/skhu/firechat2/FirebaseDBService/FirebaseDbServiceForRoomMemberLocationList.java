@@ -98,12 +98,19 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
         databaseReference.child(roomKey).child(roomMemberLocationKey).child(RoomMemberLocationList).child(key).removeValue();
     }
 
-    public void removeAllFromServer(){
-        for (int i = 0; i < roomMemberLocationItemList.size(); i++){
-            String key = roomMemberLocationItemList.getKey(i);
+/*    public void removeAllFromServer(){
+//        for (int i = 0; i < roomMemberLocationItemList.size(); i++){
+//            String key = roomMemberLocationItemList.getKey(i);
+//            databaseReference.child(roomKey).child(roomMemberLocationKey).child(RoomMemberLocationList).child(key).removeValue();
+//        }
+
+        Iterator<String> iterator = roomMemberLocationItemList.getIteratorKeys();
+        while (iterator.hasNext()) {
+            String key = iterator.next();
+
             databaseReference.child(roomKey).child(roomMemberLocationKey).child(RoomMemberLocationList).child(key).removeValue();
         }
-    }
+    }*/
 
     public void updateInServer(int index) {
         // 서버에서 데이터를 update 한다.

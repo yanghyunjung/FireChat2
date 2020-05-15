@@ -3,28 +3,22 @@ package net.skhu.firechat2.FirebaseDBService;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.StorageReference;
 
 import net.skhu.firechat2.Item.Item;
 import net.skhu.firechat2.Item.ItemList;
+import net.skhu.firechat2.ListenerInterface.OnChildAddedRoomChatListener;
 import net.skhu.firechat2.Room.BooleanCommunication;
 import net.skhu.firechat2.Room.RoomChatRecyclerViewAdapter;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.Iterator;
 
 public class FirebaseDbService implements ChildEventListener {
 
@@ -49,7 +43,10 @@ public class FirebaseDbService implements ChildEventListener {
 
     int selectPhotoIndex;
 
-    public FirebaseDbService(Context context, RoomChatRecyclerViewAdapter roomChatRecyclerViewAdapter, ItemList itemList, String userId, RecyclerView recyclerView, BooleanCommunication checkedFreeScroll, String roomKey, String roomName) {
+    OnChildAddedRoomChatListener onChildAddedRoomChatListener;
+
+    public FirebaseDbService(Context context, RoomChatRecyclerViewAdapter roomChatRecyclerViewAdapter, ItemList itemList, String userId, RecyclerView recyclerView,
+                             BooleanCommunication checkedFreeScroll, String roomKey, String roomName, OnChildAddedRoomChatListener onChildAddedRoomChatListener) {
         this.roomChatRecyclerViewAdapter = roomChatRecyclerViewAdapter;
         this.itemList = itemList; // RecyclerView에 표시할 데이터 목록
         this.userId = userId;
@@ -61,6 +58,7 @@ public class FirebaseDbService implements ChildEventListener {
         this.roomKey = roomKey;
         this.roomName = roomName;
 
+        this.onChildAddedRoomChatListener = onChildAddedRoomChatListener;
     }
 
     //데이터 베이스에 추가할 때
@@ -78,51 +76,46 @@ public class FirebaseDbService implements ChildEventListener {
         databaseReference.child(roomKey).child(roomName).child(key).removeValue();
         Item item = itemList.get(itemList.findIndex(key));
 
+        removeFile(item);
+    }
+
+    private void removeFile(Item item){
         if(item.getHavePhoto()) {
             File file = context.getFilesDir();
-            File removeFile = new File(file, item.getPhotoFileName());
-            if (removeFile.delete()) {
-                Log.i("pjw", "file remove" + removeFile.getName() + "삭제성공");
-            } else {
-                Log.i("pjw", "file remove" + removeFile.getName() + "삭제실패");
-            }
+
+            removeFile(new File(file, item.getPhotoFileName()));
         }
         else if(item.getHaveVideo()) {
             File file = context.getFilesDir();
-            File removeFile = new File(file, item.getVideoFileName());
-            if (removeFile.delete()) {
-                Log.i("pjw", "file remove" + removeFile.getName() + "삭제성공");
-            } else {
-                Log.i("pjw", "file remove" + removeFile.getName() + "삭제실패");
-            }
+
+            removeFile(new File(file, item.getVideoFileName()));
+        }
+        else if(item.getHaveMusic()){
+            File file = context.getFilesDir();
+
+            removeFile(new File(file, item.getMusicFileName()));
+        }
+    }
+
+    private void removeFile(File removeFile){
+        if (removeFile.delete()) {
+            Log.i("pjw", "file remove" + removeFile.getName() + "삭제성공");
+        } else {
+            Log.i("pjw", "file remove" + removeFile.getName() + "삭제실패");
         }
     }
 
     public void removeAllFromServer(){
-        for (int i = 0; i < itemList.size(); i++){
-            String key = itemList.getKey(i);
-            databaseReference.child(roomKey).child(roomName).child(key).removeValue();
+
+        Iterator<String> iterator = itemList.getIteratorKeys();
+        while (iterator.hasNext()) {
+            String key = iterator.next();
 
             Item item = itemList.get(itemList.findIndex(key));
 
-            if(item.getHavePhoto()) {
-                File file = context.getFilesDir();
-                File removeFile = new File(file, item.getPhotoFileName());
-                if (removeFile.delete()) {
-                    Log.i("pjw", "file remove" + removeFile.getName() + "삭제성공");
-                } else {
-                    Log.i("pjw", "file remove" + removeFile.getName() + "삭제실패");
-                }
-            }
-            else if(item.getHaveVideo()) {
-                File file = context.getFilesDir();
-                File removeFile = new File(file, item.getVideoFileName());
-                if (removeFile.delete()) {
-                    Log.i("pjw", "file remove" + removeFile.getName() + "삭제성공");
-                } else {
-                    Log.i("pjw", "file remove" + removeFile.getName() + "삭제실패");
-                }
-            }
+            removeFile(item);
+
+            databaseReference.child(roomKey).child(roomName).child(key).removeValue();
         }
     }
 
@@ -142,9 +135,7 @@ public class FirebaseDbService implements ChildEventListener {
         int index = itemList.add(key, Item); // 새 데이터를 itemList에 등록한다.
         // key 값으로 등록된 데이터 항목이 없었기 때문에 새 데이터 항목이 등록된다.
 
-        selectIndex = index;
-
-        if(itemList.get(index).getHavePhoto()){
+       /* if(itemList.get(index).getHavePhoto()){
             downloadFileName = itemList.get(index).getPhotoFileName();
 
             FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -195,7 +186,9 @@ public class FirebaseDbService implements ChildEventListener {
             } catch(Exception e){
                 e.printStackTrace();
             }
-        }
+        }*/
+
+        onChildAddedRoomChatListener.onChildAddedRoomChatListener(index);
 
         roomChatRecyclerViewAdapter.notifyItemInserted(index); // RecyclerView를 다시 그린다.
 

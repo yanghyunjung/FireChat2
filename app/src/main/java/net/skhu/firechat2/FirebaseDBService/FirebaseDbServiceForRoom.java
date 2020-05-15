@@ -73,14 +73,21 @@ public class FirebaseDbServiceForRoom implements ChildEventListener {
         //RoomItem roomItem = roomItemList.get(roomItemList.findIndex(key));
     }
 
-    public void removeAllFromServer(){
-        for (int i = 0; i < roomItemList.size(); i++){
-            String key = roomItemList.getKey(i);
-            databaseReference.child(key).removeValue();
+    /*public void removeAllFromServer(){
+//        for (int i = 0; i < roomItemList.size(); i++){
+//            String key = roomItemList.getKey(i);
+//            databaseReference.child(key).removeValue();
 
             //RoomItem roomItem = roomItemList.get(roomItemList.findIndex(key));
+//        }
+
+        Iterator<String> iterator = roomItemList.getIteratorKeys();
+        while (iterator.hasNext()) {
+            String key = iterator.next();
+
+            databaseReference.child(key).removeValue();
         }
-    }
+    }*/
 
     public void updateInServer(int index) {
         // 서버에서 데이터를 update 한다.

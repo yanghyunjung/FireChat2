@@ -197,7 +197,8 @@ public class RoomActivity extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String userId = (user != null) ? user.getUid() : "anonymous";
         firebaseDbService = new FirebaseDbService(this,
-                roomChatRecyclerViewAdapter, itemList, userId, recyclerView, checkedFreeScroll, roomKey, roomName);
+                roomChatRecyclerViewAdapter, itemList, userId, recyclerView, checkedFreeScroll, roomKey, roomName,
+                (index)->downloadPhoto(index));
 
         Button b = (Button) findViewById(R.id.btnSend);
         b.setOnClickListener(new View.OnClickListener() {
@@ -295,10 +296,12 @@ public class RoomActivity extends AppCompatActivity {
     public void intentPhotoPreview(int selectIndex){
         Item item = itemList.get(selectIndex);
 
-        Intent intent = new Intent(this, PhotoPreview.class);
-        intent.putExtra("photoFileName", item.getPhotoFileName());
-        intent.putExtra("selectIndex", selectIndex);
-        startActivity(intent);
+        if (item.getHavePhoto()) {
+            Intent intent = new Intent(this, PhotoPreview.class);
+            intent.putExtra("photoFileName", item.getPhotoFileName());
+            intent.putExtra("selectIndex", selectIndex);
+            startActivity(intent);
+        }
     }
 
     public void intentVideoPreview(int selectIndex){
@@ -375,31 +378,31 @@ public class RoomActivity extends AppCompatActivity {
         } catch(Exception e){
             e.printStackTrace();
         }*/
+        if (itemList.get(selectIndex).getHaveVideo()) {
+            Item item = itemList.get(selectIndex);
+            int index = selectIndex;
 
-        Item item = itemList.get(selectIndex);
-        int index = selectIndex;
+            path = getFilesDir();
 
-        path = getFilesDir();
+            downloadFileName = itemList.get(selectIndex).getVideoFileName();
 
-        downloadFileName = itemList.get(selectIndex).getVideoFileName();
+            //저장하는 파일의 이름
+            final File file = new File(path, downloadFileName);
 
-        //저장하는 파일의 이름
-        final File file = new File(path, downloadFileName);
+            if (!path.exists()) {
+                //저장할 폴더가 없으면 생성
+                path.mkdirs();
+            }
 
-        if (!path.exists()) {
-            //저장할 폴더가 없으면 생성
-            path.mkdirs();
-        }
-
-        if (!file.exists()){
-            FirebaseStorageService.videoDownload(this, getFilesDir(), downloadFileName,
-                    ()->roomChatRecyclerViewAdapter.notifyDataSetChanged());
-        }
-        else{
-            Intent intent = new Intent(RoomActivity.this, VideoPreview.class);
-            intent.putExtra("videoFileName", item.getVideoFileName());
-            intent.putExtra("selectIndex", index);
-            startActivity(intent);
+            if (!file.exists()) {
+                FirebaseStorageService.videoDownload(this, getFilesDir(), downloadFileName,
+                        () -> roomChatRecyclerViewAdapter.notifyDataSetChanged());
+            } else {
+                Intent intent = new Intent(RoomActivity.this, VideoPreview.class);
+                intent.putExtra("videoFileName", item.getVideoFileName());
+                intent.putExtra("selectIndex", index);
+                startActivity(intent);
+            }
         }
     }
 
@@ -472,28 +475,34 @@ public class RoomActivity extends AppCompatActivity {
             e.printStackTrace();
         }*/
 
-        Item item = itemList.get(selectIndex);
-        int index = selectIndex;
+        if (itemList.get(selectIndex).getHaveMusic()) {
 
-        path = getFilesDir();
+            path = getFilesDir();
 
-        downloadFileName = itemList.get(selectIndex).getMusicFileName();
+            downloadFileName = itemList.get(selectIndex).getMusicFileName();
 
-        //저장하는 파일의 이름
-        final File file = new File(path, downloadFileName);
+            //저장하는 파일의 이름
+            final File file = new File(path, downloadFileName);
 
-        if (!path.exists()) {
-            //저장할 폴더가 없으면 생성
-            path.mkdirs();
+            if (!path.exists()) {
+                //저장할 폴더가 없으면 생성
+                path.mkdirs();
+            }
+
+            if (!file.exists()) {
+                FirebaseStorageService.audioDownload(this, getFilesDir(), downloadFileName,
+                        () -> roomChatRecyclerViewAdapter.notifyDataSetChanged());
+            } else {
+                this.selectedIndex = selectIndex;
+                showMusicPreviewDialog();
+            }
         }
+    }
 
-        if (!file.exists()){
-            FirebaseStorageService.audioDownload(this, getFilesDir(), downloadFileName,
-                    ()->roomChatRecyclerViewAdapter.notifyDataSetChanged());
-        }
-        else{
-            selectedIndex = index;
-            showMusicPreviewDialog();
+    public void downloadPhoto(int selectIndex){
+        if(itemList.get(selectIndex).getHavePhoto()) {
+            FirebaseStorageService.imagesDownload(this, getFilesDir(), itemList.get(selectIndex).getPhotoFileName(),
+                    () -> roomChatRecyclerViewAdapter.notifyDataSetChanged());
         }
     }
 

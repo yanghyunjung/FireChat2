@@ -2,6 +2,7 @@ package net.skhu.firechat2.Item;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 // Item 객체의 목록과, firebase DB의 키(string) 목록을 관리하는 클래스
@@ -52,5 +53,9 @@ public class ItemList implements Serializable {//Serializable마킹 인터페이
         int index = findIndex(key);
         items.set(index, item);
         return index;
+    }
+
+    public Iterator<String> getIteratorKeys(){
+        return keys.iterator();
     }
 }
