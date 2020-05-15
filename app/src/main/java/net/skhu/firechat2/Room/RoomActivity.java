@@ -170,7 +170,8 @@ public class RoomActivity extends AppCompatActivity {
 
         //Toast.makeText(RoomActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
 
-        LocationUpdateThread locationUpdateThread = new LocationUpdateThread(this);
+        LocationUpdateThread locationUpdateThread = new LocationUpdateThread(this,
+                ()->firebaseDbServiceForRoomMemberLocationList.updateUserSelf());
         Thread t = new Thread(locationUpdateThread,"locationUpdateThread");
 
         t.start();
