@@ -1,11 +1,10 @@
 package net.skhu.firechat2.Room;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,22 +16,17 @@ import android.widget.VideoView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.StorageReference;
-
 import net.skhu.firechat2.Item.Item;
 import net.skhu.firechat2.Item.ItemList;
-import net.skhu.firechat2.ListenerInterface.OnItemClickListener;
+import net.skhu.firechat2.ListenerInterface.OnClickRoomMessageListener;
+import net.skhu.firechat2.ListenerInterface.OnClickRoomMusicListener;
+import net.skhu.firechat2.ListenerInterface.OnClickRoomPhotoListener;
+import net.skhu.firechat2.ListenerInterface.OnClickRoomVideoListener;
 import net.skhu.firechat2.R;
 
 import java.io.File;
-import java.io.IOException;
 
-public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class RoomChatRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     class ViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
         TextView textView1, textView2;
         //CheckBox checkBox;
@@ -54,10 +48,10 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         @Override
         public void onClick(View view) {
-            RoomActivity activity = (RoomActivity)view.getContext();
-            activity.showItemEditDialog(super.getAdapterPosition());
+            //RoomActivity activity = (RoomActivity)view.getContext();
+            //activity.showItemEditDialog(super.getAdapterPosition());
 
-            //onItemClickListener.OnItemClicked();
+            onClickRoomMessageListener.onClickRoomMessageListener(super.getAdapterPosition());
         }
     }
 
@@ -99,7 +93,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         @Override
         public void onClick(View view) {
-            Item item = itemList.get(super.getAdapterPosition());
+           /* Item item = itemList.get(super.getAdapterPosition());
 
             RoomActivity activity = (RoomActivity)view.getContext();
             //activity.showPhotoDialog(super.getAdapterPosition());
@@ -107,7 +101,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             Intent intent = new Intent(activity, PhotoPreview.class);
             intent.putExtra("photoFileName", item.getPhotoFileName());
             intent.putExtra("selectIndex", super.getAdapterPosition());
-            activity.startActivity(intent);
+            activity.startActivity(intent);*/
+
+            onClickRoomPhotoListener.onClickRoomPhotoListener(super.getAdapterPosition());
         }
     }
 
@@ -162,7 +158,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         @Override
         public void onClick(View view) {
-            final Item item = itemList.get(super.getAdapterPosition());
+           /* final Item item = itemList.get(super.getAdapterPosition());
             int index = super.getAdapterPosition();
 
             final RoomActivity activity = (RoomActivity)view.getContext();
@@ -205,10 +201,6 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                                 progressDialog.dismiss(); //업로드 진행 Dialog 상자 닫기
                                 //다운로드 성공 후 할 일
                                 Toast.makeText(context, file.getPath() + "다운로드 성공", Toast.LENGTH_LONG).show();
-                                /*Intent intent = new Intent(activity, VideoPreview.class);
-                                intent.putExtra("videoFileName", videoFileName);
-                                intent.putExtra("selectIndex", VideoIndex);
-                                activity.startActivity(intent);*/
 
                                 notifyItemChanged(VideoIndex);
                             }
@@ -240,7 +232,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 }
             } catch(Exception e){
                 e.printStackTrace();
-            }
+            }*/
+
+            onClickRoomVideoListener.onClickRoomVideoListener(super.getAdapterPosition());
         }
     }
 
@@ -272,7 +266,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         @Override
         public void onClick(View view) {
-            final Item item = itemList.get(super.getAdapterPosition());
+            /*final Item item = itemList.get(super.getAdapterPosition());
             int index = super.getAdapterPosition();
 
             final RoomActivity activity = (RoomActivity)view.getContext();
@@ -344,7 +338,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 }
             } catch(Exception e){
                 e.printStackTrace();
-            }
+            }*/
+
+            onClickRoomMusicListener.onClickRoomMusicListener(super.getAdapterPosition());
         }
     }
 
@@ -371,8 +367,10 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         @Override
         public void onClick(View view) {
-            RoomActivity activity = (RoomActivity)view.getContext();
-            activity.showItemEditDialog(super.getAdapterPosition());
+            //RoomActivity activity = (RoomActivity)view.getContext();
+            //activity.showItemEditDialog(super.getAdapterPosition());
+
+            onClickRoomMessageListener.onClickRoomMessageListener(super.getAdapterPosition());
         }
     }
 
@@ -414,7 +412,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         @Override
         public void onClick(View view) {
-            Item item = itemList.get(super.getAdapterPosition());
+           /* Item item = itemList.get(super.getAdapterPosition());
 
             RoomActivity activity = (RoomActivity)view.getContext();
             //activity.showPhotoDialog(super.getAdapterPosition());
@@ -422,7 +420,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             Intent intent = new Intent(activity, PhotoPreview.class);
             intent.putExtra("photoFileName", item.getPhotoFileName());
             intent.putExtra("selectIndex", super.getAdapterPosition());
-            activity.startActivity(intent);
+            activity.startActivity(intent);*/
+
+            onClickRoomPhotoListener.onClickRoomPhotoListener(super.getAdapterPosition());
         }
     }
 
@@ -454,10 +454,12 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
             if(videoFile.exists()){
                 videoView.setVideoPath(videoFile.toString());
-                Toast.makeText(context, "비디오 파일 있음", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, "비디오 파일 있음", Toast.LENGTH_SHORT).show();
+                Log.v("pjw", "비디오 파일 있음");
             }
             else {
-                Toast.makeText(context, "비디오 파일 없음", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, "비디오 파일 없음", Toast.LENGTH_SHORT).show();
+                Log.v("pjw", "비디오 파일 없음");
             }
 
             this.videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -477,7 +479,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         @Override
         public void onClick(View view) {
-            final Item item = itemList.get(super.getAdapterPosition());
+            /*final Item item = itemList.get(super.getAdapterPosition());
             int index = super.getAdapterPosition();
 
             final RoomActivity activity = (RoomActivity)view.getContext();
@@ -520,10 +522,6 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                                 progressDialog.dismiss(); //업로드 진행 Dialog 상자 닫기
                                 //다운로드 성공 후 할 일
                                 Toast.makeText(context, file.getPath() + "다운로드 성공", Toast.LENGTH_LONG).show();
-                                /*Intent intent = new Intent(activity, VideoPreview.class);
-                                intent.putExtra("videoFileName", videoFileName);
-                                intent.putExtra("selectIndex", VideoIndex);
-                                activity.startActivity(intent);*/
 
                                 notifyItemChanged(VideoIndex);
                             }
@@ -555,7 +553,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 }
             } catch(Exception e){
                 e.printStackTrace();
-            }
+            }*/
+
+            onClickRoomVideoListener.onClickRoomVideoListener(super.getAdapterPosition());
         }
     }
 
@@ -587,7 +587,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         @Override
         public void onClick(View view) {
-            final Item item = itemList.get(super.getAdapterPosition());
+            /*final Item item = itemList.get(super.getAdapterPosition());
             int index = super.getAdapterPosition();
 
             final RoomActivity activity = (RoomActivity)view.getContext();
@@ -659,7 +659,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 }
             } catch(Exception e){
                 e.printStackTrace();
-            }
+            }*/
+
+            onClickRoomMusicListener.onClickRoomMusicListener(super.getAdapterPosition());
         }
     }
 
@@ -667,23 +669,31 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     ItemList itemList;
     Context context;
     String userEmail;
-    OnItemClickListener onItemClickListener;
+    OnClickRoomMessageListener onClickRoomMessageListener;
+    OnClickRoomPhotoListener onClickRoomPhotoListener;
+    OnClickRoomVideoListener onClickRoomVideoListener;
+    OnClickRoomMusicListener onClickRoomMusicListener;
 
-    final int MESSAGE=0;
-    final int PHOTO=1;
-    final int VIDEO=2;
-    final int MUSIC=3;
-    final int MESSAGE_LEFT=4;
-    final int PHOTO_LEFT=5;
-    final int VIDEO_LEFT=6;
-    final int MUSIC_LEFT=7;
+    static final int MESSAGE=0;
+    static final int PHOTO=1;
+    static final int VIDEO=2;
+    static final int MUSIC=3;
+    static final int MESSAGE_LEFT=4;
+    static final int PHOTO_LEFT=5;
+    static final int VIDEO_LEFT=6;
+    static final int MUSIC_LEFT=7;
 
-    public MyRecyclerViewAdapter(Context context, ItemList itemList, String userEmail) {
+    public RoomChatRecyclerViewAdapter(Context context, ItemList itemList, String userEmail, OnClickRoomMessageListener onClickRoomMessageListener,
+                                       OnClickRoomPhotoListener onClickRoomPhotoListener, OnClickRoomVideoListener onClickRoomVideoListener,
+                                       OnClickRoomMusicListener onClickRoomMusicListener) {
         this.layoutInflater = LayoutInflater.from(context);
         this.context = context;
         this.itemList = itemList;
         this.userEmail=userEmail;
-        //this.onItemClickListener = onItemClickListener;
+        this.onClickRoomMessageListener = onClickRoomMessageListener;
+        this.onClickRoomPhotoListener = onClickRoomPhotoListener;
+        this.onClickRoomVideoListener = onClickRoomVideoListener;
+        this.onClickRoomMusicListener = onClickRoomMusicListener;
     }
 
     @Override

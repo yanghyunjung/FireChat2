@@ -31,6 +31,7 @@ import com.google.firebase.auth.FirebaseUser;
 import net.skhu.firechat2.FirebaseDBService.FirebaseDbServiceForRoom;
 import net.skhu.firechat2.Item.RoomItemList;
 import net.skhu.firechat2.Room.ItemEditDialogFragment;
+import net.skhu.firechat2.Room.RoomActivity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -106,7 +107,8 @@ public class MainActivity extends AppCompatActivity {
         roomItemList = new RoomItemList();
 
         // 리사이클러 뷰 설정
-        roomRecyclerViewAdapter = new RoomRecyclerViewAdapter(this, roomItemList);
+        roomRecyclerViewAdapter = new RoomRecyclerViewAdapter(this, roomItemList,
+                (index)->intentRoom(index));
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewRoom);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -139,6 +141,18 @@ public class MainActivity extends AppCompatActivity {
             roomCreateDialog = new RoomCreateDialog(); // 대화상자 관리자 객체를 만든다
         }
         roomCreateDialog.show(getSupportFragmentManager(), "EditDialog"); // 화면에 대화상자 보이기
+    }
+
+    public void intentRoom(int selectIndex){
+        //방으로 들어가는 Intent
+        Intent intent = new Intent(this, RoomActivity.class);
+        intent.putExtra("userName", userName);
+        intent.putExtra("userEmail", userEmail);
+        intent.putExtra("roomKey", roomItemList.getKey(selectIndex));
+        intent.putExtra("roomName", roomItemList.get(selectIndex).getRoomName());
+        intent.putExtra("roomMemberLocationKey", roomItemList.get(selectIndex).getRoomMemberLocationKey());
+
+        startActivityForResult(intent, ROOM);
     }
 
 

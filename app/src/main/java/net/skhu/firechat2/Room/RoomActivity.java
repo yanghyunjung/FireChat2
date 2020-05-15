@@ -45,6 +45,7 @@ import com.google.firebase.storage.StorageReference;
 
 import net.skhu.firechat2.FirebaseDBService.FirebaseDbService;
 import net.skhu.firechat2.FirebaseDBService.FirebaseDbServiceForRoomMemberLocationList;
+import net.skhu.firechat2.FirebaseDBService.FirebaseStorageService;
 import net.skhu.firechat2.FirebaseDBService.MusicUploadActivity;
 import net.skhu.firechat2.FirebaseDBService.PhotoUploadActivity;
 import net.skhu.firechat2.FirebaseDBService.VideoUploadActivity;
@@ -74,7 +75,8 @@ public class RoomActivity extends AppCompatActivity {
     Uri photoUrl;
     ItemList itemList;
     int selectedIndex;
-    MyRecyclerViewAdapter myRecyclerViewAdapter;
+    //MyRecyclerViewAdapter myRecyclerViewAdapter;
+    RoomChatRecyclerViewAdapter roomChatRecyclerViewAdapter;
 
     FirebaseDbService firebaseDbService;
     ItemEditDialogFragment itemEditDialogFragment; // 수정 대화상자 관리자
@@ -87,30 +89,30 @@ public class RoomActivity extends AppCompatActivity {
     BooleanCommunication checkedFreeScroll;
     CheckBox checkBoxFreeScroll;
 
-    final int DOWNLOAD_PHOTO = 2;
+    static final int DOWNLOAD_PHOTO = 2;
     String downloadFileName;
     File path;
 
     ImageView imageViewPhoto;
 
-    final int DOWNLOAD_VIDEO = 3;
+    static final int DOWNLOAD_VIDEO = 3;
     String downloadVideoFileName;
 
     String roomKey;
     String roomName;
     String roomMemberLocationKey;
 
-    final int DOWNLOAD_MUSIC = 4;
+    static final int DOWNLOAD_MUSIC = 4;
     String downloadMusicFileName;
 
-    final int DOWNLOAD_BINARY_FILE = 5;
+    static final int DOWNLOAD_BINARY_FILE = 5;
     String downloadBinaryFileName;
 
     public static Context mContext;
 
-    final int SHOW_ROOM_MEMBER = 6;
+    static final int SHOW_ROOM_MEMBER = 6;
 
-    final int SHOW_ROOM_MEMBER_LOCATION = 7;
+    static final int SHOW_ROOM_MEMBER_LOCATION = 7;
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -179,18 +181,23 @@ public class RoomActivity extends AppCompatActivity {
         itemList = new ItemList(); // 데이터 목록 객체 생성
 
         // 리사이클러 뷰 설정
-        myRecyclerViewAdapter = new MyRecyclerViewAdapter(this, itemList, userEmail);
+        //myRecyclerViewAdapter = new MyRecyclerViewAdapter(this, itemList, userEmail);
+        roomChatRecyclerViewAdapter = new RoomChatRecyclerViewAdapter(this, itemList, userEmail,
+                (index)->showItemEditDialog(index),
+                (index)->intentPhotoPreview(index),
+                (index)->intentVideoPreview(index),
+                (index)->showMusicPreviewDialog(index));
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         //recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(myRecyclerViewAdapter);
+        recyclerView.setAdapter(roomChatRecyclerViewAdapter);
 
         // firebase DB 서비스 생성
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String userId = (user != null) ? user.getUid() : "anonymous";
         firebaseDbService = new FirebaseDbService(this,
-                myRecyclerViewAdapter, itemList, userId, recyclerView, checkedFreeScroll, roomKey, roomName);
+                roomChatRecyclerViewAdapter, itemList, userId, recyclerView, checkedFreeScroll, roomKey, roomName);
 
         Button b = (Button) findViewById(R.id.btnSend);
         b.setOnClickListener(new View.OnClickListener() {
@@ -285,6 +292,210 @@ public class RoomActivity extends AppCompatActivity {
         return "geo:"+latitude+", "+longitude;
     }
 
+    public void intentPhotoPreview(int selectIndex){
+        Item item = itemList.get(selectIndex);
+
+        Intent intent = new Intent(this, PhotoPreview.class);
+        intent.putExtra("photoFileName", item.getPhotoFileName());
+        intent.putExtra("selectIndex", selectIndex);
+        startActivity(intent);
+    }
+
+    public void intentVideoPreview(int selectIndex){
+        /*Item item = itemList.get(selectIndex);
+        int index = selectIndex;
+
+        //final RoomActivity activity = (RoomActivity)view.getContext();
+        //activity.showPhotoDialog(super.getAdapterPosition());
+
+        downloadFileName = itemList.get(selectIndex).getVideoFileName();
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReferenceFromUrl("gs://firechat-51553.appspot.com").child("videos/" + downloadFileName);
+
+        path = getFilesDir();
+
+        try{
+
+            //로컬에 저장할 폴더의 위치
+            path = getFilesDir();
+
+            //저장하는 파일의 이름
+            final File file = new File(path, downloadFileName);
+            try {
+                if (!path.exists()) {
+                    //저장할 폴더가 없으면 생성
+                    path.mkdirs();
+                }
+
+                if (!file.exists()) {
+                    final ProgressDialog progressDialog = new ProgressDialog(this);
+                    progressDialog.setTitle("다운로드중...");
+                    progressDialog.show();
+
+                    file.createNewFile();
+                    //파일을 다운로드하는 Task 생성, 비동기식으로 진행
+                    final FileDownloadTask fileDownloadTask = storageRef.getFile(file);
+                    fileDownloadTask.addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        int VideoIndex = index;
+                        String videoFileName = item.getVideoFileName();
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            progressDialog.dismiss(); //업로드 진행 Dialog 상자 닫기
+                            //다운로드 성공 후 할 일
+                            Toast.makeText(RoomActivity.this, file.getPath() + "다운로드 성공", Toast.LENGTH_LONG).show();
+                            roomChatRecyclerViewAdapter.notifyItemChanged(VideoIndex);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            //다운로드 실패 후 할 일
+                            Toast.makeText(RoomActivity.this, file.getPath() + "다운로드 실패", Toast.LENGTH_LONG).show();
+                        }
+                    }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        //진행상태 표시
+                        public void onProgress(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            @SuppressWarnings("VisibleForTests") //이걸 넣어 줘야 아랫줄에 에러가 사라진다. 넌 누구냐?
+                                    double progress = (100 * taskSnapshot.getBytesTransferred()) /  taskSnapshot.getTotalByteCount();
+                            //dialog에 진행률을 퍼센트로 출력해 준다
+                            progressDialog.setMessage("download " + ((int) progress) + "% ...");
+                        }
+                    });
+                }
+                else{
+                    Intent intent = new Intent(RoomActivity.this, VideoPreview.class);
+                    intent.putExtra("videoFileName", item.getVideoFileName());
+                    intent.putExtra("selectIndex", index);
+                    startActivity(intent);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+        }*/
+
+        Item item = itemList.get(selectIndex);
+        int index = selectIndex;
+
+        path = getFilesDir();
+
+        downloadFileName = itemList.get(selectIndex).getVideoFileName();
+
+        //저장하는 파일의 이름
+        final File file = new File(path, downloadFileName);
+
+        if (!path.exists()) {
+            //저장할 폴더가 없으면 생성
+            path.mkdirs();
+        }
+
+        if (!file.exists()){
+            FirebaseStorageService.videoDownload(this, getFilesDir(), downloadFileName,
+                    ()->roomChatRecyclerViewAdapter.notifyDataSetChanged());
+        }
+        else{
+            Intent intent = new Intent(RoomActivity.this, VideoPreview.class);
+            intent.putExtra("videoFileName", item.getVideoFileName());
+            intent.putExtra("selectIndex", index);
+            startActivity(intent);
+        }
+    }
+
+    public void showMusicPreviewDialog(int selectIndex) {
+        /*final Item item = itemList.get(selectIndex);
+        int index = selectIndex;
+
+        downloadFileName = itemList.get(index).getMusicFileName();
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReferenceFromUrl("gs://firechat-51553.appspot.com").child("audio/" + downloadFileName);
+
+        try{
+
+            //로컬에 저장할 폴더의 위치
+            path = getFilesDir();
+
+            //저장하는 파일의 이름
+            final File file = new File(path, downloadFileName);
+            try {
+                if (!path.exists()) {
+                    //저장할 폴더가 없으면 생성
+                    path.mkdirs();
+                }
+
+                if (!file.exists()) {
+                    final ProgressDialog progressDialog = new ProgressDialog(this);
+                    progressDialog.setTitle("다운로드중...");
+                    progressDialog.show();
+
+                    file.createNewFile();
+                    //파일을 다운로드하는 Task 생성, 비동기식으로 진행
+                    final FileDownloadTask fileDownloadTask = storageRef.getFile(file);
+                    fileDownloadTask.addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        int MusicIndex = index;
+                        String musicFileName = item.getMusicFileName();
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            progressDialog.dismiss(); //업로드 진행 Dialog 상자 닫기
+                            //다운로드 성공 후 할 일
+                            Toast.makeText(RoomActivity.this, file.getPath() + "다운로드 성공", Toast.LENGTH_LONG).show();
+
+                            roomChatRecyclerViewAdapter.notifyItemChanged(MusicIndex);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            //다운로드 실패 후 할 일
+                            Toast.makeText(RoomActivity.this, file.getPath() + "다운로드 실패", Toast.LENGTH_LONG).show();
+                        }
+                    }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        //진행상태 표시
+                        public void onProgress(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            @SuppressWarnings("VisibleForTests") //이걸 넣어 줘야 아랫줄에 에러가 사라진다. 넌 누구냐?
+                                    double progress = (100 * taskSnapshot.getBytesTransferred()) /  taskSnapshot.getTotalByteCount();
+                            //dialog에 진행률을 퍼센트로 출력해 준다
+                            progressDialog.setMessage("download " + ((int) progress) + "% ...");
+                        }
+                    });
+                }
+                else{
+                    selectedIndex = index;
+                    showMusicPreviewDialog();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+        }*/
+
+        Item item = itemList.get(selectIndex);
+        int index = selectIndex;
+
+        path = getFilesDir();
+
+        downloadFileName = itemList.get(selectIndex).getMusicFileName();
+
+        //저장하는 파일의 이름
+        final File file = new File(path, downloadFileName);
+
+        if (!path.exists()) {
+            //저장할 폴더가 없으면 생성
+            path.mkdirs();
+        }
+
+        if (!file.exists()){
+            FirebaseStorageService.audioDownload(this, getFilesDir(), downloadFileName,
+                    ()->roomChatRecyclerViewAdapter.notifyDataSetChanged());
+        }
+        else{
+            selectedIndex = index;
+            showMusicPreviewDialog();
+        }
+    }
 
     //////////////////////////////////////////////////////////////////
 

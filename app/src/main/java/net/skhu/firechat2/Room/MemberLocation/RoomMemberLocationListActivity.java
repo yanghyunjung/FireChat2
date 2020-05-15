@@ -289,13 +289,15 @@ public class RoomMemberLocationListActivity extends AppCompatActivity {
     public void intentMapInit(int selectIndex){
         this.selectIndex = selectIndex;
 
+        firebaseDbServiceForRoomMemberLocationList.updateInServer(selectIndex);//상대 방에게 업데이트 요청
+
         LocationIntentThread locationIntentThread = new LocationIntentThread(this, selectIndex);
         Thread thread = new Thread(locationIntentThread, "locationIntentThread");
         thread.start();
     }
 
     public void intentMap(int selectIndex){
-        if (this.selectIndex == selectIndex) {//사용자가 클릭한, index일 때, 구글 지도로 넘겨주도록 했습니다.
+        if (this.selectIndex == selectIndex) {//사용자가 클릭한, index 일 때, 구글 지도로 넘겨주도록 했습니다.
             RoomMemberLocationItem roomMemberLocationItem = roomMemberLocationItemList.get(selectIndex);//업데이트 받은 것 저장
 
             Log.v("pjw", "현재위치 \n위도 " + roomMemberLocationItem.getLatitude() + "\n경도 " + roomMemberLocationItem.getLongitude());

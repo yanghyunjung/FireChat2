@@ -13,7 +13,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import net.skhu.firechat2.Item.RoomMemberLocationItem;
 import net.skhu.firechat2.Item.RoomMemberLocationItemList;
-import net.skhu.firechat2.ListenerInterface.OnChildChangedLocation;
+import net.skhu.firechat2.ListenerInterface.OnChildChangedLocationListener;
 import net.skhu.firechat2.Room.MemberLocation.GpsTracker;
 import net.skhu.firechat2.Room.MemberLocation.RoomMemberLocationRecyclerViewAdapter;
 
@@ -54,11 +54,11 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
 
     String roomMemberLocationKey;
 
-    OnChildChangedLocation onChildChangedLocation;
+    OnChildChangedLocationListener onChildChangedLocationListener;
 
     public FirebaseDbServiceForRoomMemberLocationList(Context context, RoomMemberLocationRecyclerViewAdapter roomMemberLocationRecyclerViewAdapter,
                                                       RoomMemberLocationItemList roomMemberLocationItemList, RecyclerView recyclerView, String roomKey, String roomName, String roomMemberLocationKey,
-                                                      OnChildChangedLocation onChildChangedLocation) {
+                                                      OnChildChangedLocationListener onChildChangedLocationListener) {
         this.roomMemberLocationRecyclerViewAdapter = roomMemberLocationRecyclerViewAdapter;
         this.roomMemberLocationItemList = roomMemberLocationItemList; // RecyclerView에 표시할 데이터 목록
         //this.userId = userId;
@@ -78,7 +78,7 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
         this.context = context;
         this.roomKey = roomKey;
 
-        this.onChildChangedLocation = onChildChangedLocation;
+        this.onChildChangedLocationListener = onChildChangedLocationListener;
         //this.roomName = roomName;
     }
 
@@ -203,8 +203,8 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
             }
         }
 
-        if(onChildChangedLocation != null) {
-            onChildChangedLocation.onChildChangedLocation(roomMemberLocationItemList.findIndex(key));
+        if(onChildChangedLocationListener != null) {
+            onChildChangedLocationListener.onChildChangedLocation(roomMemberLocationItemList.findIndex(key));
         }
 
         if (roomMemberLocationRecyclerViewAdapter != null) {

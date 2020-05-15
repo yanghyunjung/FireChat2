@@ -21,14 +21,15 @@ import com.google.firebase.storage.StorageReference;
 import net.skhu.firechat2.Item.Item;
 import net.skhu.firechat2.Item.ItemList;
 import net.skhu.firechat2.Room.BooleanCommunication;
-import net.skhu.firechat2.Room.MyRecyclerViewAdapter;
+import net.skhu.firechat2.Room.RoomChatRecyclerViewAdapter;
 
 import java.io.File;
 import java.io.IOException;
 
 public class FirebaseDbService implements ChildEventListener {
 
-    MyRecyclerViewAdapter myRecyclerViewAdapter;
+    //MyRecyclerViewAdapter myRecyclerViewAdapter;
+    RoomChatRecyclerViewAdapter roomChatRecyclerViewAdapter;
     ItemList itemList; // RecyclerView에 표시할 데이터 목록
     DatabaseReference databaseReference;
     String userId;
@@ -48,8 +49,8 @@ public class FirebaseDbService implements ChildEventListener {
 
     int selectPhotoIndex;
 
-    public FirebaseDbService(Context context, MyRecyclerViewAdapter myRecyclerViewAdapter, ItemList itemList, String userId, RecyclerView recyclerView, BooleanCommunication checkedFreeScroll, String roomKey, String roomName) {
-        this.myRecyclerViewAdapter = myRecyclerViewAdapter;
+    public FirebaseDbService(Context context, RoomChatRecyclerViewAdapter roomChatRecyclerViewAdapter, ItemList itemList, String userId, RecyclerView recyclerView, BooleanCommunication checkedFreeScroll, String roomKey, String roomName) {
+        this.roomChatRecyclerViewAdapter = roomChatRecyclerViewAdapter;
         this.itemList = itemList; // RecyclerView에 표시할 데이터 목록
         this.userId = userId;
         this.recyclerView = recyclerView;
@@ -172,7 +173,7 @@ public class FirebaseDbService implements ChildEventListener {
                             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                                 //다운로드 성공 후 할 일
                                 //Toast.makeText(context, file.getPath() + "다운로드 성공", Toast.LENGTH_LONG).show();
-                                myRecyclerViewAdapter.notifyItemChanged(PhotoIndex);
+                                roomChatRecyclerViewAdapter.notifyItemChanged(PhotoIndex);
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
@@ -196,9 +197,7 @@ public class FirebaseDbService implements ChildEventListener {
             }
         }
 
-
-
-        myRecyclerViewAdapter.notifyItemInserted(index); // RecyclerView를 다시 그린다.
+        roomChatRecyclerViewAdapter.notifyItemInserted(index); // RecyclerView를 다시 그린다.
 
         if (checkedFreeScroll != null) {
             if (!checkedFreeScroll.getBoolean()) {
@@ -215,7 +214,7 @@ public class FirebaseDbService implements ChildEventListener {
         Item Item = dataSnapshot.getValue(net.skhu.firechat2.Item.Item.class); // 수정된 데이터 항목을 꺼낸다.
         int index = itemList.update(key, Item);  // 수정된 데이터를 itemList에 대입한다.
         // 전에 key 값으로 등록되었던 데이터가  덮어써진다. (overwrite)
-        myRecyclerViewAdapter.notifyItemChanged(index); // RecyclerView를 다시 그린다.
+        roomChatRecyclerViewAdapter.notifyItemChanged(index); // RecyclerView를 다시 그린다.
     }
 
     @Override
@@ -224,7 +223,7 @@ public class FirebaseDbService implements ChildEventListener {
         // dataSnapshot은 서버에서 삭제된 데이터 항목이다.
         String key = dataSnapshot.getKey(); // 삭제된 데이터 항목의 키 값을 꺼낸다.
         int index = itemList.remove(key); // itemList에서 그 데이터 항목을 삭제한다.
-        myRecyclerViewAdapter.notifyItemRemoved(index); // RecyclerView를 다시 그린다.
+        roomChatRecyclerViewAdapter.notifyItemRemoved(index); // RecyclerView를 다시 그린다.
     }
 
     @Override
