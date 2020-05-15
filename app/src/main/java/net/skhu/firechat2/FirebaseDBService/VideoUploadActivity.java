@@ -52,10 +52,14 @@ public class VideoUploadActivity extends AppCompatActivity {
     static final int RC_LOGIN = 2; //  로그인 액티비티 호출을 구별하기 위한 식별 번호이다.
     FirebaseUser currentUser = null; // 현재 사용자
 
+    boolean uploaded;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_upload);
+
+        uploaded = false;
 
         //레이아웃 위젯 findViewById
         videoView = (VideoView) findViewById(R.id.view);
@@ -105,7 +109,9 @@ public class VideoUploadActivity extends AppCompatActivity {
         btnUploadVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                uploadFile();
+                if (uploaded == false) {
+                    uploadFile();
+                }
             }
         });
 
@@ -167,6 +173,8 @@ public class VideoUploadActivity extends AppCompatActivity {
     private void uploadFile() {
         //업로드할 파일이 있으면 수행
         if (filePath != null) {
+            uploaded = true;
+
             //업로드 진행 Dialog 보이기
             final ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("업로드중...");

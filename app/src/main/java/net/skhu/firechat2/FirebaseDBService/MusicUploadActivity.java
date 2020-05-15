@@ -54,10 +54,14 @@ public class MusicUploadActivity extends AppCompatActivity {
 
     final static int MUSIC = 1;
 
+    boolean uploaded;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_upload);
+
+        uploaded = false;
 
         bt_chooseMusic = (Button) findViewById(R.id.bt_chooseMusic);
         bt_uploadMusic = (Button) findViewById(R.id.bt_uploadMusic);
@@ -83,8 +87,11 @@ public class MusicUploadActivity extends AppCompatActivity {
         bt_uploadMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //업로드
-                uploadFile();
+                if (uploaded==false) {
+                    //업로드
+                    uploadFile();
+                }
+
             }
         });
 
@@ -177,6 +184,8 @@ public class MusicUploadActivity extends AppCompatActivity {
     private void uploadFile() {
         //업로드할 파일이 있으면 수행
         if (filePath != null) {
+            uploaded = true;
+
             //업로드 진행 Dialog 보이기
             final ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("업로드중...");

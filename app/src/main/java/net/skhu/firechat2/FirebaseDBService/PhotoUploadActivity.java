@@ -51,10 +51,14 @@ public class PhotoUploadActivity extends AppCompatActivity {
     String filename;
     String mediaType;
 
+    boolean uploaded;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_upload);
+
+        uploaded = false;
 
         btChoose = (Button) findViewById(R.id.bt_choose);
         btUpload = (Button) findViewById(R.id.bt_upload);
@@ -75,10 +79,12 @@ public class PhotoUploadActivity extends AppCompatActivity {
         btUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //업로드
-                uploadFile();
+                if(uploaded == false) {
+                    //업로드
+                    uploadFile();
 
-                //finish();
+                    //finish();
+                }
             }
         });
     }
@@ -105,6 +111,8 @@ public class PhotoUploadActivity extends AppCompatActivity {
     private void uploadFile() {
         //업로드할 파일이 있으면 수행
         if (filePath != null) {
+            uploaded=true;
+
             //업로드 진행 Dialog 보이기
             final ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("업로드중...");
