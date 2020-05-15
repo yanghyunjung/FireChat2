@@ -978,6 +978,4 @@ public class RoomActivity extends AppCompatActivity {
             firebaseDbServiceForRoomMemberLocationList.removeFromServer(roomMemberLocationItemList.getKey(index));
         }
     }
-
-
 }
