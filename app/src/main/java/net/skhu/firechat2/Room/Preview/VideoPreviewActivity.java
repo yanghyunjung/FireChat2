@@ -1,4 +1,4 @@
-package net.skhu.firechat2.Room;
+package net.skhu.firechat2.Room.Preview;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -24,8 +24,7 @@ import net.skhu.firechat2.R;
 
 import java.io.File;
 
-public class VideoPreview extends AppCompatActivity {
-
+public class VideoPreviewActivity extends AppCompatActivity {
     //private static final int URL = ;
     String videoFileName;
     VideoView videoViewPreview;
@@ -45,7 +44,6 @@ public class VideoPreview extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_preview);
-
 
         currentPos=0;
 
