@@ -18,10 +18,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.skhu.firechat2.Item.Item;
 import net.skhu.firechat2.Item.ItemList;
-import net.skhu.firechat2.ListenerInterface.RoomChatListener.OnClickRoomMessageListener;
-import net.skhu.firechat2.ListenerInterface.RoomChatListener.OnClickRoomMusicListener;
-import net.skhu.firechat2.ListenerInterface.RoomChatListener.OnClickRoomPhotoListener;
-import net.skhu.firechat2.ListenerInterface.RoomChatListener.OnClickRoomVideoListener;
+import net.skhu.firechat2.ListenerInterface.RoomChatListener.RecyclerView.OnClickRoomMessageListener;
+import net.skhu.firechat2.ListenerInterface.RoomChatListener.RecyclerView.OnClickRoomMusicListener;
+import net.skhu.firechat2.ListenerInterface.RoomChatListener.RecyclerView.OnClickRoomPhotoListener;
+import net.skhu.firechat2.ListenerInterface.RoomChatListener.RecyclerView.OnClickRoomVideoListener;
 import net.skhu.firechat2.R;
 
 import java.io.File;

@@ -3,8 +3,6 @@ package net.skhu.firechat2.FirebaseDBService;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -22,7 +20,7 @@ public class FirebaseDbServiceForRoom implements ChildEventListener {
     //RoomItemList roomItemList; // RecyclerView에 표시할 데이터 목록
     DatabaseReference databaseReference;
     String userId;
-    RecyclerView recyclerView;
+    //RecyclerView recyclerView;
     //BooleanCommunication checkedFreeScroll;
     Context context;
 
@@ -35,11 +33,10 @@ public class FirebaseDbServiceForRoom implements ChildEventListener {
 
     int selectPhotoIndex;
 
-    public FirebaseDbServiceForRoom(Context context, RoomRecyclerViewAdapter roomRecyclerViewAdapter, String userId, RecyclerView recyclerView) {
+    public FirebaseDbServiceForRoom(Context context, RoomRecyclerViewAdapter roomRecyclerViewAdapter, String userId) {
         this.roomRecyclerViewAdapter = roomRecyclerViewAdapter;
        // this.roomItemList = roomItemList; // RecyclerView에 표시할 데이터 목록
         this.userId = userId;
-        this.recyclerView = recyclerView;
         //this.checkedFreeScroll = checkedFreeScroll;
         databaseReference = FirebaseDatabase.getInstance().getReference("myServerData04");
         databaseReference.addChildEventListener(this);
@@ -87,10 +84,11 @@ public class FirebaseDbServiceForRoom implements ChildEventListener {
         }
     }*/
 
-    public void updateInServer(int index) {
+    public void updateInServer(String key, RoomItem roomItem) {
         // 서버에서 데이터를 update 한다.
-        String key = roomRecyclerViewAdapter.getKey(index);
-        RoomItem roomItem = roomRecyclerViewAdapter.get(index);
+        //String key = roomRecyclerViewAdapter.getKey(index);
+        //RoomItem roomItem = roomRecyclerViewAdapter.get(index);
+
         databaseReference.child(key).setValue(roomItem);
     }
 
