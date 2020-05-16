@@ -48,10 +48,10 @@ import net.skhu.firechat2.FirebaseDBService.FirebaseDbServiceForRoomMemberLocati
 import net.skhu.firechat2.FirebaseDBService.FirebaseStorageService;
 import net.skhu.firechat2.FirebaseDBService.MusicUploadActivity;
 import net.skhu.firechat2.FirebaseDBService.PhotoUploadActivity;
+import net.skhu.firechat2.FirebaseDBService.RemoveFileThread;
 import net.skhu.firechat2.FirebaseDBService.VideoUploadActivity;
 import net.skhu.firechat2.InitInformDialog;
 import net.skhu.firechat2.Item.Item;
-import net.skhu.firechat2.Item.ItemList;
 import net.skhu.firechat2.Item.RoomMemberLocationItem;
 import net.skhu.firechat2.Item.RoomMemberLocationItemList;
 import net.skhu.firechat2.R;
@@ -62,6 +62,7 @@ import net.skhu.firechat2.UnCatchTaskService;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -73,10 +74,11 @@ public class RoomActivity extends AppCompatActivity {
     String userName;
     String userEmail;
     Uri photoUrl;
-    ItemList itemList;
+    //ItemList itemList;
     int selectedIndex;
     //MyRecyclerViewAdapter myRecyclerViewAdapter;
     RoomChatRecyclerViewAdapter roomChatRecyclerViewAdapter;
+    RecyclerView recyclerView;
 
     FirebaseDbService firebaseDbService;
     ItemEditDialogFragment itemEditDialogFragment; // 수정 대화상자 관리자
@@ -86,7 +88,7 @@ public class RoomActivity extends AppCompatActivity {
     MusicPreviewDialog musicPreviewDialog;
 
 
-    BooleanCommunication checkedFreeScroll;
+    boolean checkedFreeScroll;
     CheckBox checkBoxFreeScroll;
 
     static final int DOWNLOAD_PHOTO = 2;
@@ -113,6 +115,10 @@ public class RoomActivity extends AppCompatActivity {
     static final int SHOW_ROOM_MEMBER = 6;
 
     static final int SHOW_ROOM_MEMBER_LOCATION = 7;
+
+    static final int PHOTO_PREVIEW = 8;
+
+    static final int VIDEO_PREVIEW = 9;
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -179,16 +185,16 @@ public class RoomActivity extends AppCompatActivity {
 
     // 리사이클러뷰 초기화 작업
     private void initRecyclerView() {
-        itemList = new ItemList(); // 데이터 목록 객체 생성
+        //itemList = new ItemList(); // 데이터 목록 객체 생성
 
         // 리사이클러 뷰 설정
         //myRecyclerViewAdapter = new MyRecyclerViewAdapter(this, itemList, userEmail);
-        roomChatRecyclerViewAdapter = new RoomChatRecyclerViewAdapter(this, itemList, userEmail,
+        roomChatRecyclerViewAdapter = new RoomChatRecyclerViewAdapter(this, userEmail,
                 (index)->showItemEditDialog(index),
                 (index)->intentPhotoPreview(index),
                 (index)->intentVideoPreview(index),
                 (index)->showMusicPreviewDialog(index));
-        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         //recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -197,9 +203,10 @@ public class RoomActivity extends AppCompatActivity {
         // firebase DB 서비스 생성
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String userId = (user != null) ? user.getUid() : "anonymous";
-        firebaseDbService = new FirebaseDbService(this,
-                roomChatRecyclerViewAdapter, itemList, userId, recyclerView, checkedFreeScroll, roomKey, roomName,
-                (index)->downloadPhoto(index));
+        firebaseDbService = new FirebaseDbService(this, userId, roomKey, roomName,
+                (key, item)->onAddedChatListener(key, item),
+                (key, item)->onChangedChatListener(key, item),
+                (key)->onRemovedChatListener(key));
 
         Button b = (Button) findViewById(R.id.btnSend);
         b.setOnClickListener(new View.OnClickListener() {
@@ -245,17 +252,18 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     public void initCheckBoxScroll(){
-        checkedFreeScroll = new BooleanCommunication(false);//스크롤을 자유 해제를 default로 해주었습니다.
-
         checkBoxFreeScroll = (CheckBox) findViewById(R.id.checkBoxFreeScroll);
+        checkBoxFreeScroll.setChecked(false);
+        checkedFreeScroll = false;//스크롤을 자유 해제를 default로 해주었습니다.
+
         checkBoxFreeScroll.setOnClickListener(new CheckBox.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (checkedFreeScroll.getBoolean()) {
-                    checkedFreeScroll.setBoolean(false);
+                if (checkedFreeScroll) {
+                    checkedFreeScroll=false;
                     Toast.makeText(getApplicationContext(), "자유 스크롤이 해제되었습니다.", Toast.LENGTH_SHORT).show();
                 } else {
-                    checkedFreeScroll.setBoolean(true);
+                    checkedFreeScroll=true;
                     Toast.makeText(getApplicationContext(), "자유 스크롤이 설정되었습니다.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -295,13 +303,14 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     public void intentPhotoPreview(int selectIndex){
-        Item item = itemList.get(selectIndex);
+        Item item = roomChatRecyclerViewAdapter.get(selectIndex);
 
         if (item.getHavePhoto()) {
             Intent intent = new Intent(this, PhotoPreview.class);
             intent.putExtra("photoFileName", item.getPhotoFileName());
             intent.putExtra("selectIndex", selectIndex);
-            startActivity(intent);
+            //startActivity(intent);
+            startActivityForResult(intent, PHOTO_PREVIEW);
         }
     }
 
@@ -379,13 +388,13 @@ public class RoomActivity extends AppCompatActivity {
         } catch(Exception e){
             e.printStackTrace();
         }*/
-        if (itemList.get(selectIndex).getHaveVideo()) {
-            Item item = itemList.get(selectIndex);
+        if (roomChatRecyclerViewAdapter.get(selectIndex).getHaveVideo()) {
+            Item item = roomChatRecyclerViewAdapter.get(selectIndex);
             int index = selectIndex;
 
             path = getFilesDir();
 
-            downloadFileName = itemList.get(selectIndex).getVideoFileName();
+            downloadFileName = roomChatRecyclerViewAdapter.get(selectIndex).getVideoFileName();
 
             //저장하는 파일의 이름
             final File file = new File(path, downloadFileName);
@@ -402,7 +411,7 @@ public class RoomActivity extends AppCompatActivity {
                 Intent intent = new Intent(RoomActivity.this, VideoPreview.class);
                 intent.putExtra("videoFileName", item.getVideoFileName());
                 intent.putExtra("selectIndex", index);
-                startActivity(intent);
+                startActivityForResult(intent, VIDEO_PREVIEW);
             }
         }
     }
@@ -476,11 +485,11 @@ public class RoomActivity extends AppCompatActivity {
             e.printStackTrace();
         }*/
 
-        if (itemList.get(selectIndex).getHaveMusic()) {
+        if (roomChatRecyclerViewAdapter.get(selectIndex).getHaveMusic()) {
 
             path = getFilesDir();
 
-            downloadFileName = itemList.get(selectIndex).getMusicFileName();
+            downloadFileName = roomChatRecyclerViewAdapter.get(selectIndex).getMusicFileName();
 
             //저장하는 파일의 이름
             final File file = new File(path, downloadFileName);
@@ -500,11 +509,51 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
+    public void removeAll(){
+
+        Iterator<String> iterator = roomChatRecyclerViewAdapter.getIteratorKeys();
+        while (iterator.hasNext()) {
+            //String key = iterator.next();
+            //Item item = roomChatRecyclerViewAdapter.get(roomChatRecyclerViewAdapter.findIndex(key));
+            //removeFile(item);
+            //databaseReference.child(roomKey).child(roomName).child(key).removeValue();
+
+            firebaseDbService.removeFromServer(iterator.next());
+        }
+    }
+
+    public void onAddedChatListener(String key, Item item) {
+        int index = roomChatRecyclerViewAdapter.add(key, item); // 새 데이터를 itemList에 등록한다.
+
+        downloadPhoto(index);
+
+        roomChatRecyclerViewAdapter.notifyItemInserted(index); // RecyclerView를 다시 그린다.
+
+        if (!checkedFreeScroll) {
+            recyclerView.scrollToPosition(index);
+        }
+    }
+
     public void downloadPhoto(int selectIndex){
-        if(itemList.get(selectIndex).getHavePhoto()) {
-            FirebaseStorageService.imagesDownload(this, getFilesDir(), itemList.get(selectIndex).getPhotoFileName(),
+        if(roomChatRecyclerViewAdapter.get(selectIndex).getHavePhoto()) {
+            FirebaseStorageService.imagesDownload(this, getFilesDir(), roomChatRecyclerViewAdapter.get(selectIndex).getPhotoFileName(),
                     () -> roomChatRecyclerViewAdapter.notifyDataSetChanged());
         }
+    }
+
+    public void onChangedChatListener(String key, Item item){
+        int index = roomChatRecyclerViewAdapter.update(key, item);  // 수정된 데이터를 itemList에 대입한다.
+        // 전에 key 값으로 등록되었던 데이터가  덮어써진다. (overwrite)
+        roomChatRecyclerViewAdapter.notifyItemChanged(index); // RecyclerView를 다시 그린다.
+    }
+
+    public void onRemovedChatListener(String key){
+        RemoveFileThread removeFileThread = new RemoveFileThread(roomChatRecyclerViewAdapter.get(roomChatRecyclerViewAdapter.findIndex(key)), getFilesDir());
+        Thread t = new Thread(removeFileThread,"RemoveFileThread");
+        t.start();
+
+        int index = roomChatRecyclerViewAdapter.remove(key); // itemList에서 그 데이터 항목을 삭제한다.
+        roomChatRecyclerViewAdapter.notifyItemRemoved(index); // RecyclerView를 다시 그린다.
     }
 
     //////////////////////////////////////////////////////////////////
@@ -525,7 +574,8 @@ public class RoomActivity extends AppCompatActivity {
             this.showRenameDialog();
             return true;
         } else if (id == R.id.action_removeAll) {
-            firebaseDbService.removeAllFromServer();
+            //firebaseDbService.removeAllFromServer();
+            removeAll();
             return true;
         } else if (id == R.id.scroll) {
             this.showScrollDialog();
@@ -540,7 +590,8 @@ public class RoomActivity extends AppCompatActivity {
             return true;
         }
         else if (id == R.id.action_closeRoom) {
-            firebaseDbService.removeAllFromServer();
+            //firebaseDbService.removeAllFromServer();
+            removeAll();
 
             Intent intent = new Intent();
             intent.putExtra("roomKey", roomKey);
@@ -948,6 +999,32 @@ public class RoomActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                }
+            }
+        }
+
+        if (requestCode == PHOTO_PREVIEW) {
+            if (resultCode == Activity.RESULT_OK) {
+                extras = data.getExtras();
+                if (extras != null) {
+                    int index = extras.getInt("selectIndex");
+
+                    String key = roomChatRecyclerViewAdapter.getKey(index);
+                    firebaseDbService.removeFromServer(key);
+
+                }
+            }
+        }
+
+        if (requestCode == VIDEO_PREVIEW) {
+            if (resultCode == Activity.RESULT_OK) {
+                extras = data.getExtras();
+                if (extras != null) {
+                    int index = extras.getInt("selectIndex");
+
+                    String key = roomChatRecyclerViewAdapter.getKey(index);
+                    firebaseDbService.removeFromServer(key);
+
                 }
             }
         }

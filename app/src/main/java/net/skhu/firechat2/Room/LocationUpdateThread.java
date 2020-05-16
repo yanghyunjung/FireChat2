@@ -2,7 +2,7 @@ package net.skhu.firechat2.Room;
 
 import android.content.Context;
 
-import net.skhu.firechat2.ListenerInterface.OnUpdateUserSelfListener;
+import net.skhu.firechat2.ListenerInterface.RoomLocationListener.OnUpdateUserSelfListener;
 
 public class LocationUpdateThread implements Runnable {
     //View view;

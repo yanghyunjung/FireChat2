@@ -18,13 +18,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.skhu.firechat2.Item.Item;
 import net.skhu.firechat2.Item.ItemList;
-import net.skhu.firechat2.ListenerInterface.OnClickRoomMessageListener;
-import net.skhu.firechat2.ListenerInterface.OnClickRoomMusicListener;
-import net.skhu.firechat2.ListenerInterface.OnClickRoomPhotoListener;
-import net.skhu.firechat2.ListenerInterface.OnClickRoomVideoListener;
+import net.skhu.firechat2.ListenerInterface.RoomChatListener.OnClickRoomMessageListener;
+import net.skhu.firechat2.ListenerInterface.RoomChatListener.OnClickRoomMusicListener;
+import net.skhu.firechat2.ListenerInterface.RoomChatListener.OnClickRoomPhotoListener;
+import net.skhu.firechat2.ListenerInterface.RoomChatListener.OnClickRoomVideoListener;
 import net.skhu.firechat2.R;
 
 import java.io.File;
+import java.util.Iterator;
 
 public class RoomChatRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     class ViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
@@ -666,7 +667,6 @@ public class RoomChatRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     }
 
     LayoutInflater layoutInflater;
-    ItemList itemList;
     Context context;
     String userEmail;
     OnClickRoomMessageListener onClickRoomMessageListener;
@@ -683,17 +683,59 @@ public class RoomChatRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     static final int VIDEO_LEFT=6;
     static final int MUSIC_LEFT=7;
 
-    public RoomChatRecyclerViewAdapter(Context context, ItemList itemList, String userEmail, OnClickRoomMessageListener onClickRoomMessageListener,
+    ItemList itemList;
+
+    public RoomChatRecyclerViewAdapter(Context context, String userEmail, OnClickRoomMessageListener onClickRoomMessageListener,
                                        OnClickRoomPhotoListener onClickRoomPhotoListener, OnClickRoomVideoListener onClickRoomVideoListener,
                                        OnClickRoomMusicListener onClickRoomMusicListener) {
         this.layoutInflater = LayoutInflater.from(context);
         this.context = context;
-        this.itemList = itemList;
         this.userEmail=userEmail;
         this.onClickRoomMessageListener = onClickRoomMessageListener;
         this.onClickRoomPhotoListener = onClickRoomPhotoListener;
         this.onClickRoomVideoListener = onClickRoomVideoListener;
         this.onClickRoomMusicListener = onClickRoomMusicListener;
+
+        this.itemList = new ItemList();
+    }
+
+    // index 위치의 Item 객체를 리턴
+    public Item get(int index) {
+        return itemList.get(index);
+    }
+
+    // index 위치의 키 값을 리턴
+    public String getKey(int index) {
+        return itemList.getKey(index);
+    }
+
+    // Item 객체의 수를 리턴
+    public int size() {
+        return itemList.size();
+    }
+
+    // key 값의 index를 리턴
+    public int findIndex(String key) {
+        return itemList.findIndex(key);
+    }
+
+    // key 값에 해당하는 Item 객체를 목록에서 제거
+    public int remove(String key) {
+        return itemList.remove(key);
+    }
+
+    // key 값과 Item 객체를 목록에 추가
+    public int add(String key, Item item) {
+       return itemList.add(key, item);
+    }
+
+    // key 값에 해당하는 Item 객체 변경
+    public int update(String key, Item item) {
+        return itemList.update(key, item);
+    }
+
+    public Iterator<String> getIteratorKeys(){
+        return itemList.getIteratorKeys();
     }
 
     @Override

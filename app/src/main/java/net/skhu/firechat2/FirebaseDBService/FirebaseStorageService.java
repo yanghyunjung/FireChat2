@@ -12,7 +12,7 @@ import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 
-import net.skhu.firechat2.ListenerInterface.OnFileDownloadCompleteListener;
+import net.skhu.firechat2.ListenerInterface.RoomChatListener.OnFileDownloadCompleteListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -174,9 +174,9 @@ public class FirebaseStorageService {
                 }
 
                 if (!file.exists()) {
-                    final ProgressDialog progressDialog = new ProgressDialog(context);
-                    progressDialog.setTitle("다운로드중...");
-                    progressDialog.show();
+                   // final ProgressDialog progressDialog = new ProgressDialog(context);
+                    //progressDialog.setTitle("다운로드중...");
+                   // progressDialog.show();
 
                     file.createNewFile();
                     //파일을 다운로드하는 Task 생성, 비동기식으로 진행
@@ -187,7 +187,7 @@ public class FirebaseStorageService {
                         //String videoFileName = item.getVideoFileName();
                         @Override
                         public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                            progressDialog.dismiss(); //업로드 진행 Dialog 상자 닫기
+                            //progressDialog.dismiss(); //업로드 진행 Dialog 상자 닫기
                             //다운로드 성공 후 할 일
                             onFileDownloadCompleteListener.onFileDownloadCompleteListener();
 
@@ -207,7 +207,7 @@ public class FirebaseStorageService {
                             @SuppressWarnings("VisibleForTests") //이걸 넣어 줘야 아랫줄에 에러가 사라진다. 넌 누구냐?
                                     double progress = (100 * taskSnapshot.getBytesTransferred()) /  taskSnapshot.getTotalByteCount();
                             //dialog에 진행률을 퍼센트로 출력해 준다
-                            progressDialog.setMessage("download " + ((int) progress) + "% ...");
+                            //progressDialog.setMessage("download " + ((int) progress) + "% ...");
                         }
                     });
                 }

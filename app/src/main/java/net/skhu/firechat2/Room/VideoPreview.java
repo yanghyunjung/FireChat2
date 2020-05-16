@@ -1,5 +1,6 @@
 package net.skhu.firechat2.Room;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
@@ -170,8 +171,13 @@ public class VideoPreview extends AppCompatActivity {
             return true;
         }
         else if (id == R.id.action_removeVideo) {
-            String key = ((RoomActivity) RoomActivity.mContext).itemList.getKey(selectIndex);
-            ((RoomActivity) RoomActivity.mContext).firebaseDbService.removeFromServer(key);
+            //String key = ((RoomActivity) RoomActivity.mContext).itemList.getKey(selectIndex);
+            //((RoomActivity) RoomActivity.mContext).firebaseDbService.removeFromServer(key);
+
+            Intent intent = new Intent();
+            intent.putExtra("selectIndex", selectIndex);
+            setResult(Activity.RESULT_OK, intent);
+
             this.finish();
             return true;
         }

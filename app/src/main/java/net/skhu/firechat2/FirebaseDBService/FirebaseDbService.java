@@ -3,8 +3,6 @@ package net.skhu.firechat2.FirebaseDBService;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -12,23 +10,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import net.skhu.firechat2.Item.Item;
-import net.skhu.firechat2.Item.ItemList;
-import net.skhu.firechat2.ListenerInterface.OnChildAddedRoomChatListener;
-import net.skhu.firechat2.Room.BooleanCommunication;
-import net.skhu.firechat2.Room.RoomChatRecyclerViewAdapter;
+import net.skhu.firechat2.ListenerInterface.RoomChatListener.Firebase.OnChildAddedRoomChatListener;
+import net.skhu.firechat2.ListenerInterface.RoomChatListener.Firebase.OnChildChangedRoomChatListener;
+import net.skhu.firechat2.ListenerInterface.RoomChatListener.Firebase.OnChildRemovedRoomChatListener;
 
 import java.io.File;
-import java.util.Iterator;
 
 public class FirebaseDbService implements ChildEventListener {
 
     //MyRecyclerViewAdapter myRecyclerViewAdapter;
-    RoomChatRecyclerViewAdapter roomChatRecyclerViewAdapter;
-    ItemList itemList; // RecyclerView에 표시할 데이터 목록
+    //RoomChatRecyclerViewAdapter roomChatRecyclerViewAdapter;
+    //ItemList itemList; // RecyclerView에 표시할 데이터 목록
     DatabaseReference databaseReference;
     String userId;
-    RecyclerView recyclerView;
-    BooleanCommunication checkedFreeScroll;
+    //RecyclerView recyclerView;
+    //BooleanCommunication checkedFreeScroll;
     Context context;
 
     String downloadFileName;
@@ -44,14 +40,16 @@ public class FirebaseDbService implements ChildEventListener {
     int selectPhotoIndex;
 
     OnChildAddedRoomChatListener onChildAddedRoomChatListener;
+    OnChildChangedRoomChatListener onChildChangedRoomChatListener;
+    OnChildRemovedRoomChatListener onChildRemovedRoomChatListener;
 
-    public FirebaseDbService(Context context, RoomChatRecyclerViewAdapter roomChatRecyclerViewAdapter, ItemList itemList, String userId, RecyclerView recyclerView,
-                             BooleanCommunication checkedFreeScroll, String roomKey, String roomName, OnChildAddedRoomChatListener onChildAddedRoomChatListener) {
-        this.roomChatRecyclerViewAdapter = roomChatRecyclerViewAdapter;
-        this.itemList = itemList; // RecyclerView에 표시할 데이터 목록
+    public FirebaseDbService(Context context, String userId, String roomKey, String roomName, OnChildAddedRoomChatListener onChildAddedRoomChatListener,
+                             OnChildChangedRoomChatListener onChildChangedRoomChatListener, OnChildRemovedRoomChatListener onChildRemovedRoomChatListener) {
+        //this.roomChatRecyclerViewAdapter = roomChatRecyclerViewAdapter;
+        //this.itemList = itemList; // RecyclerView에 표시할 데이터 목록
         this.userId = userId;
-        this.recyclerView = recyclerView;
-        this.checkedFreeScroll = checkedFreeScroll;
+        //this.recyclerView = recyclerView;
+        //this.checkedFreeScroll = checkedFreeScroll;
         databaseReference = FirebaseDatabase.getInstance().getReference("myServerData04");
         databaseReference.child(roomKey).child(roomName).addChildEventListener(this);
         this.context = context;
@@ -59,6 +57,8 @@ public class FirebaseDbService implements ChildEventListener {
         this.roomName = roomName;
 
         this.onChildAddedRoomChatListener = onChildAddedRoomChatListener;
+        this.onChildChangedRoomChatListener = onChildChangedRoomChatListener;
+        this.onChildRemovedRoomChatListener = onChildRemovedRoomChatListener;
     }
 
     //데이터 베이스에 추가할 때
@@ -74,55 +74,29 @@ public class FirebaseDbService implements ChildEventListener {
         // 서버에서 데이터를 delete 한다.
         // 서버에서 key 값으로 등록된 데이터가 제거된다.
         databaseReference.child(roomKey).child(roomName).child(key).removeValue();
-        Item item = itemList.get(itemList.findIndex(key));
 
-        removeFile(item);
+        //Item item = roomChatRecyclerViewAdapter.get(roomChatRecyclerViewAdapter.findIndex(key));
+
+        //removeFile(item);
     }
 
-    private void removeFile(Item item){
-        if(item.getHavePhoto()) {
-            File file = context.getFilesDir();
+//    public void removeAllFromServer(){
+//
+//        Iterator<String> iterator = roomChatRecyclerViewAdapter.getIteratorKeys();
+//        while (iterator.hasNext()) {
+//            //String key = iterator.next();
+            //Item item = roomChatRecyclerViewAdapter.get(roomChatRecyclerViewAdapter.findIndex(key));
+            //removeFile(item);
+            //databaseReference.child(roomKey).child(roomName).child(key).removeValue();
 
-            removeFile(new File(file, item.getPhotoFileName()));
-        }
-        else if(item.getHaveVideo()) {
-            File file = context.getFilesDir();
+//            removeFromServer(iterator.next());
+//        }
+//    }
 
-            removeFile(new File(file, item.getVideoFileName()));
-        }
-        else if(item.getHaveMusic()){
-            File file = context.getFilesDir();
-
-            removeFile(new File(file, item.getMusicFileName()));
-        }
-    }
-
-    private void removeFile(File removeFile){
-        if (removeFile.delete()) {
-            Log.i("pjw", "file remove" + removeFile.getName() + "삭제성공");
-        } else {
-            Log.i("pjw", "file remove" + removeFile.getName() + "삭제실패");
-        }
-    }
-
-    public void removeAllFromServer(){
-
-        Iterator<String> iterator = itemList.getIteratorKeys();
-        while (iterator.hasNext()) {
-            String key = iterator.next();
-
-            Item item = itemList.get(itemList.findIndex(key));
-
-            removeFile(item);
-
-            databaseReference.child(roomKey).child(roomName).child(key).removeValue();
-        }
-    }
-
-    public void updateInServer(int index) {
+    public void updateInServer(String key, Item item) {
         // 서버에서 데이터를 update 한다.
-        String key = itemList.getKey(index);
-        Item item = itemList.get(index);
+        //String key = roomChatRecyclerViewAdapter.getKey(index);
+       // Item item = roomChatRecyclerViewAdapter.get(index);
         databaseReference.child(roomKey).child(roomName).child(key).setValue(item);
     }
 
@@ -131,72 +105,20 @@ public class FirebaseDbService implements ChildEventListener {
         // DB에 새 데이터 항목이 등록되었을 때, 이 메소드가 자동으로 호출된다.
         // dataSnapshot은 서버에서 등록된 새 데이터 항목이다.
         String key = dataSnapshot.getKey(); // 새 데이터 항목의 키 값을 꺼낸다.
-        Item Item = dataSnapshot.getValue(net.skhu.firechat2.Item.Item.class);  // 새 데이터 항목을 꺼낸다.
-        int index = itemList.add(key, Item); // 새 데이터를 itemList에 등록한다.
+        Item item = dataSnapshot.getValue(net.skhu.firechat2.Item.Item.class);  // 새 데이터 항목을 꺼낸다.
+
+//        int index = roomChatRecyclerViewAdapter.add(key, item); // 새 데이터를 itemList에 등록한다.
         // key 값으로 등록된 데이터 항목이 없었기 때문에 새 데이터 항목이 등록된다.
 
-       /* if(itemList.get(index).getHavePhoto()){
-            downloadFileName = itemList.get(index).getPhotoFileName();
+//        roomChatRecyclerViewAdapter.notifyItemInserted(index); // RecyclerView를 다시 그린다.
 
-            FirebaseStorage storage = FirebaseStorage.getInstance();
-            StorageReference storageRef = storage.getReferenceFromUrl("gs://firechat-51553.appspot.com").child("images/" + downloadFileName);
+        //       if (checkedFreeScroll != null) {
+//            if (!checkedFreeScroll.getBoolean()) {
+//                recyclerView.scrollToPosition(index);
+//            }
+//        }
 
-            selectPhotoIndex = index;
-
-            try{
-                //로컬에 저장할 폴더의 위치
-                path = context.getFilesDir();
-
-                //저장하는 파일의 이름
-                final File file = new File(path, downloadFileName);
-                try {
-                    if (!path.exists()) {
-                        //저장할 폴더가 없으면 생성
-                        path.mkdirs();
-                    }
-                    if (!file.exists()) {
-                        file.createNewFile();
-                        //파일을 다운로드하는 Task 생성, 비동기식으로 진행
-                        final FileDownloadTask fileDownloadTask = storageRef.getFile(file);
-                        fileDownloadTask.addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                            int PhotoIndex = selectPhotoIndex;
-                            @Override
-                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                //다운로드 성공 후 할 일
-                                //Toast.makeText(context, file.getPath() + "다운로드 성공", Toast.LENGTH_LONG).show();
-                                roomChatRecyclerViewAdapter.notifyItemChanged(PhotoIndex);
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                //다운로드 실패 후 할 일
-                                //Toast.makeText(context, file.getPath() + "다운로드 실패", Toast.LENGTH_LONG).show();
-                            }
-                        }).addOnProgressListener(new OnProgressListener<FileDownloadTask.TaskSnapshot>() {
-                            @Override
-                            //진행상태 표시
-                            public void onProgress(FileDownloadTask.TaskSnapshot taskSnapshot) {
-
-                            }
-                        });
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } catch(Exception e){
-                e.printStackTrace();
-            }
-        }*/
-
-        onChildAddedRoomChatListener.onChildAddedRoomChatListener(index);
-
-        roomChatRecyclerViewAdapter.notifyItemInserted(index); // RecyclerView를 다시 그린다.
-
-        if (checkedFreeScroll != null) {
-            if (!checkedFreeScroll.getBoolean()) {
-                recyclerView.scrollToPosition(index);
-            }
-        }
+        onChildAddedRoomChatListener.onChildAddedRoomChatListener(key, item);
     }
 
     @Override
@@ -204,10 +126,13 @@ public class FirebaseDbService implements ChildEventListener {
         // DB의 어떤 데이터 항목이 수정되었을 때, 이 메소드가 자동으로 호출된다.
         // dataSnapshot은 서버에서 수정된 데이터 항목이다.
         String key = dataSnapshot.getKey();  // 수정된 데이터 항목의 키 값을 꺼낸다.
-        Item Item = dataSnapshot.getValue(net.skhu.firechat2.Item.Item.class); // 수정된 데이터 항목을 꺼낸다.
-        int index = itemList.update(key, Item);  // 수정된 데이터를 itemList에 대입한다.
+        Item item = dataSnapshot.getValue(net.skhu.firechat2.Item.Item.class); // 수정된 데이터 항목을 꺼낸다.
+
+        //int index = roomChatRecyclerViewAdapter.update(key, item);  // 수정된 데이터를 itemList에 대입한다.
         // 전에 key 값으로 등록되었던 데이터가  덮어써진다. (overwrite)
-        roomChatRecyclerViewAdapter.notifyItemChanged(index); // RecyclerView를 다시 그린다.
+        //roomChatRecyclerViewAdapter.notifyItemChanged(index); // RecyclerView를 다시 그린다.
+
+        onChildChangedRoomChatListener.onChildChangedRoomChatListener(key, item);
     }
 
     @Override
@@ -215,8 +140,17 @@ public class FirebaseDbService implements ChildEventListener {
         // DB의 어떤 데이터 항목이 삭제 되었을 때, 이 메소드가 자동으로 호출된다.
         // dataSnapshot은 서버에서 삭제된 데이터 항목이다.
         String key = dataSnapshot.getKey(); // 삭제된 데이터 항목의 키 값을 꺼낸다.
-        int index = itemList.remove(key); // itemList에서 그 데이터 항목을 삭제한다.
-        roomChatRecyclerViewAdapter.notifyItemRemoved(index); // RecyclerView를 다시 그린다.
+
+        //removeFile(roomChatRecyclerViewAdapter.get(roomChatRecyclerViewAdapter.findIndex(key)));
+
+//        RemoveFileThread removeFileThread = new RemoveFileThread(roomChatRecyclerViewAdapter.get(roomChatRecyclerViewAdapter.findIndex(key)), context.getFilesDir());
+//        Thread t = new Thread(removeFileThread,"RemoveFileThread");
+//        t.start();
+
+//        int index = roomChatRecyclerViewAdapter.remove(key); // itemList에서 그 데이터 항목을 삭제한다.
+//        roomChatRecyclerViewAdapter.notifyItemRemoved(index); // RecyclerView를 다시 그린다.
+
+        onChildRemovedRoomChatListener.onChildRemovedRoomChatListener(key);
     }
 
     @Override

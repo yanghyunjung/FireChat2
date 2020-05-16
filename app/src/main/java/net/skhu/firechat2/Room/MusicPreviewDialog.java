@@ -25,7 +25,7 @@ public class MusicPreviewDialog extends DialogFragment {
     // 한 번 만들어진 대화상자는 계속 재사용 된다.
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final RoomActivity activity = (RoomActivity)getActivity();  // 액티비티 객체에 대한 참조 얻기
-        final Item item = activity.itemList.get(activity.selectedIndex); // 선택된 항목 얻기
+        final Item item = activity.roomChatRecyclerViewAdapter.get(activity.selectedIndex); // 선택된 항목 얻기
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("음악 재생"); // 대화 상자의 제목 설정하기
 
@@ -55,7 +55,7 @@ public class MusicPreviewDialog extends DialogFragment {
             @Override
             // 대화상자의 '삭제' 버튼이 클릭되면 실행되는 메소드
             public void onClick(DialogInterface dialog, int which) {
-                String key = activity.itemList.getKey(activity.selectedIndex);
+                String key = activity.roomChatRecyclerViewAdapter.getKey(activity.selectedIndex);
                 activity.firebaseDbService.removeFromServer(key);
             } // onClick 메소드의 끝
         });

@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.skhu.firechat2.Item.RoomMemberLocationItem;
 import net.skhu.firechat2.Item.RoomMemberLocationItemList;
-import net.skhu.firechat2.ListenerInterface.OnClickRoomMemberLocationListener;
+import net.skhu.firechat2.ListenerInterface.RoomLocationListener.OnClickRoomMemberLocationListener;
 import net.skhu.firechat2.R;
 
 public class RoomMemberLocationRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {

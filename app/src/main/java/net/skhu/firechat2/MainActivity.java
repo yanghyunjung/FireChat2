@@ -29,8 +29,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import net.skhu.firechat2.FirebaseDBService.FirebaseDbServiceForRoom;
-import net.skhu.firechat2.Item.RoomItemList;
-import net.skhu.firechat2.Room.ItemEditDialogFragment;
 import net.skhu.firechat2.Room.RoomActivity;
 
 import java.util.Arrays;
@@ -48,13 +46,12 @@ public class MainActivity extends AppCompatActivity {
     //MyRecyclerViewAdapter myRecyclerViewAdapter;
     RoomRecyclerViewAdapter roomRecyclerViewAdapter;
 
-    RoomItemList roomItemList;
+    //RoomItemList roomItemList;
 
    // RoomMemberItemList roomMemberItemList;
    // FirebaseDbServiceForRoomMemberList firebaseDbServiceForRoomMemberList;
 
     FirebaseDbServiceForRoom firebaseDbServiceForRoom;
-    ItemEditDialogFragment itemEditDialogFragment; // 수정 대화상자 관리자
     InitInformDialog initInformDialog;
     RoomCreateDialog roomCreateDialog;
 
@@ -103,11 +100,9 @@ public class MainActivity extends AppCompatActivity {
 
     // 리사이클러뷰 초기화 작업
     private void initRecyclerView() {
-        //itemList = new ItemList(); // 데이터 목록 객체 생성
-        roomItemList = new RoomItemList();
 
         // 리사이클러 뷰 설정
-        roomRecyclerViewAdapter = new RoomRecyclerViewAdapter(this, roomItemList,
+        roomRecyclerViewAdapter = new RoomRecyclerViewAdapter(this,
                 (index)->intentRoom(index));
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewRoom);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
@@ -119,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String userId = (user != null) ? user.getUid() : "anonymous";
         firebaseDbServiceForRoom = new FirebaseDbServiceForRoom(this,
-                roomRecyclerViewAdapter, roomItemList, userId, recyclerView);
+                roomRecyclerViewAdapter, userId, recyclerView);
 
         //this.showRenameDialog();
 
@@ -148,9 +143,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, RoomActivity.class);
         intent.putExtra("userName", userName);
         intent.putExtra("userEmail", userEmail);
-        intent.putExtra("roomKey", roomItemList.getKey(selectIndex));
-        intent.putExtra("roomName", roomItemList.get(selectIndex).getRoomName());
-        intent.putExtra("roomMemberLocationKey", roomItemList.get(selectIndex).getRoomMemberLocationKey());
+        intent.putExtra("roomKey", roomRecyclerViewAdapter.getKey(selectIndex));
+        intent.putExtra("roomName", roomRecyclerViewAdapter.get(selectIndex).getRoomName());
+        intent.putExtra("roomMemberLocationKey", roomRecyclerViewAdapter.get(selectIndex).getRoomMemberLocationKey());
 
         startActivityForResult(intent, ROOM);
     }

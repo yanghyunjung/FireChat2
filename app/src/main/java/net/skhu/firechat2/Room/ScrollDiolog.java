@@ -27,7 +27,7 @@ public class ScrollDiolog extends DialogFragment {
 
 
         final CheckBox checkBoxFreeScroll = (CheckBox)rootView.findViewById(R.id.checkBoxFreeScroll);
-        checkBoxFreeScroll.setChecked(activity.checkedFreeScroll.getBoolean());
+        checkBoxFreeScroll.setChecked(activity.checkedFreeScroll);
 
         // 자동으로 생성된 뷰 객체들을 대화상자에 추가한다
         builder.setView(rootView);
@@ -38,12 +38,12 @@ public class ScrollDiolog extends DialogFragment {
             // 대화상자의 '확인' 버튼이 클릭되면 실행되는 메소드
             public void onClick(DialogInterface dialog, int which) {
                 if (checkBoxFreeScroll.isChecked()) {
-                    activity.checkedFreeScroll.setBoolean(true);
+                    activity.checkedFreeScroll = true;
                     activity.checkBoxFreeScroll.setChecked(true);
                     Toast.makeText(activity.getApplicationContext(), "자유 스크롤이 설정되었습니다.", Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    activity.checkedFreeScroll.setBoolean(false);
+                    activity.checkedFreeScroll = false;
                     activity.checkBoxFreeScroll.setChecked(false);
                     Toast.makeText(activity.getApplicationContext(), "자유 스크롤이 해제되었습니다.", Toast.LENGTH_SHORT).show();
                 }
