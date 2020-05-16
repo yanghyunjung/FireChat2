@@ -1,4 +1,4 @@
-package net.skhu.firechat2.FirebaseDBService;
+package net.skhu.firechat2.Room;
 
 import android.util.Log;
 

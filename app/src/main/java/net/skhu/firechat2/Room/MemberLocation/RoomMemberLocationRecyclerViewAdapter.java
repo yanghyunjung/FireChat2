@@ -14,6 +14,8 @@ import net.skhu.firechat2.Item.RoomMemberLocationItemList;
 import net.skhu.firechat2.ListenerInterface.RoomLocationListener.OnClickRoomMemberLocationListener;
 import net.skhu.firechat2.R;
 
+import java.util.Iterator;
+
 public class RoomMemberLocationRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
     class ViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
         TextView textViewRoomMemberLocation;
@@ -39,7 +41,9 @@ public class RoomMemberLocationRecyclerViewAdapter extends RecyclerView.Adapter<
 
             //activity.firebaseDbServiceForRoomMemberLocationList.updateInServer(super.getAdapterPosition());//상대 방에게 업데이트 요청
 
-            onClickRoomMemberLocationListener.onClickRoomMemberLocation(super.getAdapterPosition());
+            if(onClickRoomMemberLocationListener != null) {
+                onClickRoomMemberLocationListener.onClickRoomMemberLocation(super.getAdapterPosition());
+            }
 
             //LocationIntentThread locationIntentThread = new LocationIntentThread(view, super.getAdapterPosition());
             //Thread thread = new Thread(locationIntentThread, "locationIntentThread");
@@ -80,11 +84,50 @@ public class RoomMemberLocationRecyclerViewAdapter extends RecyclerView.Adapter<
 
     final int ROOM_MEMBER_LOCATION=0;
 
-    public RoomMemberLocationRecyclerViewAdapter(Context context, RoomMemberLocationItemList roomMemberLocationItemList, OnClickRoomMemberLocationListener onClickRoomMemberLocationListener) {
+    public RoomMemberLocationRecyclerViewAdapter(Context context, OnClickRoomMemberLocationListener onClickRoomMemberLocationListener) {
         this.layoutInflater = LayoutInflater.from(context);
         this.context = context;
-        this.roomMemberLocationItemList = roomMemberLocationItemList;
+        this.roomMemberLocationItemList = new RoomMemberLocationItemList();
         this.onClickRoomMemberLocationListener = onClickRoomMemberLocationListener;
+    }
+
+    // index 위치의 Item 객체를 리턴
+    public RoomMemberLocationItem get(int index) {
+        return roomMemberLocationItemList.get(index);
+    }
+
+    // index 위치의 키 값을 리턴
+    public String getKey(int index) {
+        return roomMemberLocationItemList.getKey(index);
+    }
+
+    // Item 객체의 수를 리턴
+    public int size() {
+        return roomMemberLocationItemList.size();
+    }
+
+    // key 값의 index를 리턴
+    public int findIndex(String key) {
+        return roomMemberLocationItemList.findIndex(key);
+    }
+
+    // key 값에 해당하는 Item 객체를 목록에서 제거
+    public int remove(String key) {
+        return roomMemberLocationItemList.remove(key);
+    }
+
+    // key 값과 Item 객체를 목록에 추가
+    public int add(String key, RoomMemberLocationItem roomMemberLocationItem) {
+        return roomMemberLocationItemList.add(key, roomMemberLocationItem);
+    }
+
+    // key 값에 해당하는 Item 객체 변경
+    public int update(String key, RoomMemberLocationItem roomMemberLocationItem) {
+        return roomMemberLocationItemList.update(key, roomMemberLocationItem);
+    }
+
+    public Iterator<String> getIteratorKeys(){
+        return roomMemberLocationItemList.getIteratorKeys();
     }
 
     @Override

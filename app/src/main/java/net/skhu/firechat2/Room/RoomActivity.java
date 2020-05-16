@@ -48,14 +48,13 @@ import net.skhu.firechat2.FirebaseDBService.FirebaseDbServiceForRoomMemberLocati
 import net.skhu.firechat2.FirebaseDBService.FirebaseStorageService;
 import net.skhu.firechat2.FirebaseDBService.MusicUploadActivity;
 import net.skhu.firechat2.FirebaseDBService.PhotoUploadActivity;
-import net.skhu.firechat2.FirebaseDBService.RemoveFileThread;
 import net.skhu.firechat2.FirebaseDBService.VideoUploadActivity;
 import net.skhu.firechat2.InitInformDialog;
 import net.skhu.firechat2.Item.Item;
 import net.skhu.firechat2.Item.RoomMemberLocationItem;
-import net.skhu.firechat2.Item.RoomMemberLocationItemList;
 import net.skhu.firechat2.R;
 import net.skhu.firechat2.Room.MemberLocation.GpsTracker;
+import net.skhu.firechat2.Room.MemberLocation.LocationFunc;
 import net.skhu.firechat2.Room.MemberLocation.RoomMemberLocationListActivity;
 import net.skhu.firechat2.Room.MemberLocation.RoomMemberLocationRecyclerViewAdapter;
 import net.skhu.firechat2.UnCatchTaskService;
@@ -124,10 +123,12 @@ public class RoomActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
-    RoomMemberLocationItemList roomMemberLocationItemList;
+    //RoomMemberLocationItemList roomMemberLocationItemList;
     FirebaseDbServiceForRoomMemberLocationList firebaseDbServiceForRoomMemberLocationList;
     RoomMemberLocationRecyclerViewAdapter roomMemberLocationRecyclerViewAdapter;
     private GpsTracker gpsTracker;
+
+    LocationUpdateThread locationUpdateThread;
 
     // 로그인 액티비티를 호출할 때, 사용할 요청 식별 번호(request code) 이다.
     static final int RC_SIGN_IN = 337;
@@ -176,8 +177,8 @@ public class RoomActivity extends AppCompatActivity {
 
         //Toast.makeText(RoomActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
 
-        LocationUpdateThread locationUpdateThread = new LocationUpdateThread(this,
-                ()->firebaseDbServiceForRoomMemberLocationList.updateUserSelf());
+        locationUpdateThread = new LocationUpdateThread(this,
+                ()->updateLocationUserSelf());
         Thread t = new Thread(locationUpdateThread,"locationUpdateThread");
 
         t.start();
@@ -233,7 +234,7 @@ public class RoomActivity extends AppCompatActivity {
 
     // 리사이클러뷰 초기화 작업
     private void initRecyclerViewRoomMemberLocationList() {
-        roomMemberLocationItemList = new RoomMemberLocationItemList(); // 데이터 목록 객체 생성
+        //roomMemberLocationItemList = new RoomMemberLocationItemList(); // 데이터 목록 객체 생성
 
         /*// 리사이클러 뷰 설정
         roomMemberLocationRecyclerViewAdapter = new RoomMemberLocationRecyclerViewAdapter(this, roomMemberLocationItemList);
@@ -246,9 +247,14 @@ public class RoomActivity extends AppCompatActivity {
         // firebase DB 서비스 생성
         //FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         //String userId = (user != null) ? user.getUid() : "anonymous";
-        firebaseDbServiceForRoomMemberLocationList = new FirebaseDbServiceForRoomMemberLocationList(this,
-                null, roomMemberLocationItemList, null, roomKey, roomName, roomMemberLocationKey,
+        roomMemberLocationRecyclerViewAdapter = new RoomMemberLocationRecyclerViewAdapter(this,
                 null);
+
+        firebaseDbServiceForRoomMemberLocationList = new FirebaseDbServiceForRoomMemberLocationList(
+                this, roomKey, roomName, roomMemberLocationKey,
+                (key, roomMemberLocationItem)->onAddedRoomMemberLocationListener(key, roomMemberLocationItem),
+                (key, roomMemberLocationItem)->onChangedRoomMemberLocationListener(key, roomMemberLocationItem),
+                (key)->onRemovedRoomMemberLocationListener(key));
     }
 
     public void initCheckBoxScroll(){
@@ -296,10 +302,6 @@ public class RoomActivity extends AppCompatActivity {
             musicPreviewDialog = new MusicPreviewDialog(); // 대화상자 관리자 객체를 만든다
         }
         musicPreviewDialog.show(getSupportFragmentManager(), "EditDialog"); // 화면에 대화상자 보이기
-    }
-
-    public static String locationDataStr(double latitude, double longitude){
-        return "geo:"+latitude+", "+longitude;
     }
 
     public void intentPhotoPreview(int selectIndex){
@@ -556,6 +558,40 @@ public class RoomActivity extends AppCompatActivity {
         roomChatRecyclerViewAdapter.notifyItemRemoved(index); // RecyclerView를 다시 그린다.
     }
 
+    public void updateLocationUserSelf(){
+        firebaseDbServiceForRoomMemberLocationList.updateUserSelf(roomMemberLocationRecyclerViewAdapter.get(
+                roomMemberLocationRecyclerViewAdapter.findIndex(firebaseDbServiceForRoomMemberLocationList.getUserKey())));
+    }
+
+    public void onAddedRoomMemberLocationListener(String key, RoomMemberLocationItem roomMemberLocationItem){
+        int index = roomMemberLocationRecyclerViewAdapter.add(key, roomMemberLocationItem); // 새 데이터를 itemList에 등록한다.
+        // key 값으로 등록된 데이터 항목이 없었기 때문에 새 데이터 항목이 등록된다.
+
+        if (roomMemberLocationRecyclerViewAdapter != null) {
+            roomMemberLocationRecyclerViewAdapter.notifyItemInserted(index); // RecyclerView를 다시 그린다.
+            //roomMemberRecyclerViewAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void onChangedRoomMemberLocationListener(String key, RoomMemberLocationItem roomMemberLocationItem){
+        int index = roomMemberLocationRecyclerViewAdapter.update(key, roomMemberLocationItem);  // 수정된 데이터를 itemList에 대입한다.
+        // 전에 key 값으로 등록되었던 데이터가  덮어써진다. (overwrite)
+
+        if (roomMemberLocationRecyclerViewAdapter != null) {
+            roomMemberLocationRecyclerViewAdapter.notifyItemChanged(index); // RecyclerView를 다시 그린다.
+            //roomMemberRecyclerViewAdapter.notifyDataSetChanged();
+        }
+
+    }
+
+    public void onRemovedRoomMemberLocationListener(String key){
+        int index = roomMemberLocationRecyclerViewAdapter.remove(key); // itemList에서 그 데이터 항목을 삭제한다.
+        if (roomMemberLocationRecyclerViewAdapter != null) {
+            roomMemberLocationRecyclerViewAdapter.notifyItemRemoved(index); // RecyclerView를 다시 그린다.
+            //roomMemberRecyclerViewAdapter.notifyDataSetChanged();
+        }
+    }
+
     //////////////////////////////////////////////////////////////////
 
     @Override
@@ -620,23 +656,23 @@ public class RoomActivity extends AppCompatActivity {
         }
         else if (id == R.id.action_showMidpoint) {
 
-            firebaseDbServiceForRoomMemberLocationList.updateInServerAll();
+            //firebaseDbServiceForRoomMemberLocationList.updateInServerAll();
 
             double midpointLatitude = 0;
             double midpointLongitude = 0;
 
-            for (int i = 0; i < roomMemberLocationItemList.size(); i++) {
-                midpointLatitude += roomMemberLocationItemList.get(i).getLatitude();
-                midpointLongitude += roomMemberLocationItemList.get(i).getLongitude();
+            for (int i = 0; i < roomMemberLocationRecyclerViewAdapter.size(); i++) {
+                midpointLatitude += roomMemberLocationRecyclerViewAdapter.get(i).getLatitude();
+                midpointLongitude += roomMemberLocationRecyclerViewAdapter.get(i).getLongitude();
             }
-            midpointLatitude = midpointLatitude/roomMemberLocationItemList.size();
-            midpointLongitude = midpointLongitude/roomMemberLocationItemList.size();
+            midpointLatitude = midpointLatitude/roomMemberLocationRecyclerViewAdapter.size();
+            midpointLongitude = midpointLongitude/roomMemberLocationRecyclerViewAdapter.size();
 
             Intent intent = new Intent();
             intent.setAction(Intent.ACTION_VIEW);
             intent.setPackage("com.google.android.apps.maps");
             //String data = "geo:"+midpointLatitude+", "+midpointLongitude;
-            intent.setData(Uri.parse(locationDataStr(midpointLatitude, midpointLongitude)));
+            intent.setData(Uri.parse(LocationFunc.locationDataStr(midpointLatitude, midpointLongitude)));
             startActivity(intent);
 
             return true;
@@ -1054,15 +1090,17 @@ public class RoomActivity extends AppCompatActivity {
         super.onDestroy();
 
         int index = -1;
-        for (int i = 0; i < roomMemberLocationItemList.size(); i++){
-            if (roomMemberLocationItemList.get(i).getUserEmail().equals(userEmail)){
+        for (int i = 0; i < roomMemberLocationRecyclerViewAdapter.size(); i++){
+            if (roomMemberLocationRecyclerViewAdapter.get(i).getUserEmail().equals(userEmail)){
                 index = i;
                 break;
             }
         }
 
         if (index >=0 ) {
-            firebaseDbServiceForRoomMemberLocationList.removeFromServer(roomMemberLocationItemList.getKey(index));
+            firebaseDbServiceForRoomMemberLocationList.removeFromServer(roomMemberLocationRecyclerViewAdapter.getKey(index));
         }
+
+        locationUpdateThread.cancel();
     }
 }

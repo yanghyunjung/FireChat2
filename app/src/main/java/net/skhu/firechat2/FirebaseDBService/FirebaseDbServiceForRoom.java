@@ -10,13 +10,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import net.skhu.firechat2.Item.RoomItem;
-import net.skhu.firechat2.RoomRecyclerViewAdapter;
+import net.skhu.firechat2.ListenerInterface.OnChildAddedRoomListener;
+import net.skhu.firechat2.ListenerInterface.OnChildChangedRoomListener;
+import net.skhu.firechat2.ListenerInterface.OnChildRemovedRoomListener;
 
 import java.io.File;
 
 public class FirebaseDbServiceForRoom implements ChildEventListener {
 
-    RoomRecyclerViewAdapter roomRecyclerViewAdapter;
+    //RoomRecyclerViewAdapter roomRecyclerViewAdapter;
     //RoomItemList roomItemList; // RecyclerView에 표시할 데이터 목록
     DatabaseReference databaseReference;
     String userId;
@@ -33,8 +35,13 @@ public class FirebaseDbServiceForRoom implements ChildEventListener {
 
     int selectPhotoIndex;
 
-    public FirebaseDbServiceForRoom(Context context, RoomRecyclerViewAdapter roomRecyclerViewAdapter, String userId) {
-        this.roomRecyclerViewAdapter = roomRecyclerViewAdapter;
+    OnChildAddedRoomListener onChildAddedRoomListener;
+    OnChildChangedRoomListener onChildChangedRoomListener;
+    OnChildRemovedRoomListener onChildRemovedRoomListener;
+
+    public FirebaseDbServiceForRoom(Context context, String userId,
+                                    OnChildAddedRoomListener onChildAddedRoomListener, OnChildChangedRoomListener onChildChangedRoomListener,
+                                    OnChildRemovedRoomListener onChildRemovedRoomListener) {
        // this.roomItemList = roomItemList; // RecyclerView에 표시할 데이터 목록
         this.userId = userId;
         //this.checkedFreeScroll = checkedFreeScroll;
@@ -42,6 +49,9 @@ public class FirebaseDbServiceForRoom implements ChildEventListener {
         databaseReference.addChildEventListener(this);
         this.context = context;
 
+        this.onChildAddedRoomListener = onChildAddedRoomListener;
+        this.onChildChangedRoomListener = onChildChangedRoomListener;
+        this.onChildRemovedRoomListener = onChildRemovedRoomListener;
     }
 
     //데이터 베이스에 추가할 때
@@ -98,14 +108,15 @@ public class FirebaseDbServiceForRoom implements ChildEventListener {
         // dataSnapshot은 서버에서 등록된 새 데이터 항목이다.
         String key = dataSnapshot.getKey(); // 새 데이터 항목의 키 값을 꺼낸다.
         RoomItem roomItem = dataSnapshot.getValue(net.skhu.firechat2.Item.RoomItem.class);  // 새 데이터 항목을 꺼낸다.
-        int index = roomRecyclerViewAdapter.add(key, roomItem); // 새 데이터를 itemList에 등록한다.
+
+       // int index = roomRecyclerViewAdapter.add(key, roomItem); // 새 데이터를 itemList에 등록한다.
         // key 값으로 등록된 데이터 항목이 없었기 때문에 새 데이터 항목이 등록된다.
 
-        selectIndex = index;
 
+        //roomRecyclerViewAdapter.notifyItemInserted(index); // RecyclerView를 다시 그린다.
+       // roomRecyclerViewAdapter.notifyDataSetChanged();
 
-        roomRecyclerViewAdapter.notifyItemInserted(index); // RecyclerView를 다시 그린다.
-        roomRecyclerViewAdapter.notifyDataSetChanged();
+        onChildAddedRoomListener.onChildAddedRoomListener(key, roomItem);
 
     }
 
@@ -114,11 +125,14 @@ public class FirebaseDbServiceForRoom implements ChildEventListener {
         // DB의 어떤 데이터 항목이 수정되었을 때, 이 메소드가 자동으로 호출된다.
         // dataSnapshot은 서버에서 수정된 데이터 항목이다.
         String key = dataSnapshot.getKey();  // 수정된 데이터 항목의 키 값을 꺼낸다.
-        RoomItem RoomItem = dataSnapshot.getValue(net.skhu.firechat2.Item.RoomItem.class); // 수정된 데이터 항목을 꺼낸다.
-        int index = roomRecyclerViewAdapter.update(key, RoomItem);  // 수정된 데이터를 itemList에 대입한다.
+        RoomItem roomItem = dataSnapshot.getValue(net.skhu.firechat2.Item.RoomItem.class); // 수정된 데이터 항목을 꺼낸다.
+
+        //int index = roomRecyclerViewAdapter.update(key, roomItem);  // 수정된 데이터를 itemList에 대입한다.
         // 전에 key 값으로 등록되었던 데이터가  덮어써진다. (overwrite)
-        roomRecyclerViewAdapter.notifyItemChanged(index); // RecyclerView를 다시 그린다.
-        roomRecyclerViewAdapter.notifyDataSetChanged();
+        //roomRecyclerViewAdapter.notifyItemChanged(index); // RecyclerView를 다시 그린다.
+        //roomRecyclerViewAdapter.notifyDataSetChanged();
+
+        onChildChangedRoomListener.onChildChangedRoomListener(key, roomItem);
     }
 
     @Override
@@ -126,9 +140,12 @@ public class FirebaseDbServiceForRoom implements ChildEventListener {
         // DB의 어떤 데이터 항목이 삭제 되었을 때, 이 메소드가 자동으로 호출된다.
         // dataSnapshot은 서버에서 삭제된 데이터 항목이다.
         String key = dataSnapshot.getKey(); // 삭제된 데이터 항목의 키 값을 꺼낸다.
-        int index = roomRecyclerViewAdapter.remove(key); // itemList에서 그 데이터 항목을 삭제한다.
-        roomRecyclerViewAdapter.notifyItemRemoved(index); // RecyclerView를 다시 그린다.
-        roomRecyclerViewAdapter.notifyDataSetChanged();
+
+        //int index = roomRecyclerViewAdapter.remove(key); // itemList에서 그 데이터 항목을 삭제한다.
+       // roomRecyclerViewAdapter.notifyItemRemoved(index); // RecyclerView를 다시 그린다.
+        //roomRecyclerViewAdapter.notifyDataSetChanged();
+
+        onChildRemovedRoomListener.onChildRemovedRoomListener(key);
     }
 
     @Override

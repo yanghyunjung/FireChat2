@@ -29,6 +29,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import net.skhu.firechat2.FirebaseDBService.FirebaseDbServiceForRoom;
+import net.skhu.firechat2.Item.RoomItem;
 import net.skhu.firechat2.Room.RoomActivity;
 
 import java.util.Arrays;
@@ -113,8 +114,10 @@ public class MainActivity extends AppCompatActivity {
         // firebase DB 서비스 생성
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String userId = (user != null) ? user.getUid() : "anonymous";
-        firebaseDbServiceForRoom = new FirebaseDbServiceForRoom(this,
-                roomRecyclerViewAdapter, userId);
+        firebaseDbServiceForRoom = new FirebaseDbServiceForRoom(this, userId,
+                (key, roomItem)->onAddedRoomListener(key, roomItem),
+                (key, roomItem)->onChangedRoomListener(key, roomItem),
+                (key)->onRemovedRoomListener(key));
 
         //this.showRenameDialog();
 
@@ -150,6 +153,26 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, ROOM);
     }
 
+    public void onAddedRoomListener(String key, RoomItem roomItem) {
+        int index = roomRecyclerViewAdapter.add(key, roomItem); // 새 데이터를 itemList에 등록한다.
+        // key 값으로 등록된 데이터 항목이 없었기 때문에 새 데이터 항목이 등록된다.
+
+        //roomRecyclerViewAdapter.notifyItemInserted(index); // RecyclerView를 다시 그린다.
+        roomRecyclerViewAdapter.notifyDataSetChanged();
+    }
+
+    public void onChangedRoomListener(String key, RoomItem roomItem) {
+        int index = roomRecyclerViewAdapter.update(key, roomItem);  // 수정된 데이터를 itemList에 대입한다.
+        // 전에 key 값으로 등록되었던 데이터가  덮어써진다. (overwrite)
+        //roomRecyclerViewAdapter.notifyItemChanged(index); // RecyclerView를 다시 그린다.
+        roomRecyclerViewAdapter.notifyDataSetChanged();
+    }
+
+    public void onRemovedRoomListener(String key) {
+        int index = roomRecyclerViewAdapter.remove(key); // itemList에서 그 데이터 항목을 삭제한다.
+        //roomRecyclerViewAdapter.notifyItemRemoved(index); // RecyclerView를 다시 그린다.
+        roomRecyclerViewAdapter.notifyDataSetChanged();
+    }
 
     //////////////////////////////////////////////////////////////////
 

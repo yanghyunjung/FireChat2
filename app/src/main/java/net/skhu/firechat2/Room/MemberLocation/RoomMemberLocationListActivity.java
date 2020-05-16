@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.skhu.firechat2.FirebaseDBService.FirebaseDbServiceForRoomMemberLocationList;
 import net.skhu.firechat2.Item.RoomMemberLocationItem;
-import net.skhu.firechat2.Item.RoomMemberLocationItemList;
 import net.skhu.firechat2.R;
 import net.skhu.firechat2.UnCatchTaskService;
 
@@ -35,7 +34,7 @@ import java.util.Locale;
 public class RoomMemberLocationListActivity extends AppCompatActivity {
 
 
-    RoomMemberLocationItemList roomMemberLocationItemList;
+    //RoomMemberLocationItemList roomMemberLocationItemList;
     FirebaseDbServiceForRoomMemberLocationList firebaseDbServiceForRoomMemberLocationList;
     RoomMemberLocationRecyclerViewAdapter roomMemberLocationRecyclerViewAdapter;
 
@@ -79,10 +78,10 @@ public class RoomMemberLocationListActivity extends AppCompatActivity {
 
     // 리사이클러뷰 초기화 작업
     private void initRecyclerViewRoomMemberLocationList() {
-        roomMemberLocationItemList = new RoomMemberLocationItemList(); // 데이터 목록 객체 생성
+        //roomMemberLocationItemList = new RoomMemberLocationItemList(); // 데이터 목록 객체 생성
 
         // 리사이클러 뷰 설정
-        roomMemberLocationRecyclerViewAdapter = new RoomMemberLocationRecyclerViewAdapter(this, roomMemberLocationItemList,
+        roomMemberLocationRecyclerViewAdapter = new RoomMemberLocationRecyclerViewAdapter(this,
                 (index)->intentMapInit(index));
 
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewRoomMemberLocationList);
@@ -94,9 +93,11 @@ public class RoomMemberLocationListActivity extends AppCompatActivity {
         // firebase DB 서비스 생성
         //FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         //String userId = (user != null) ? user.getUid() : "anonymous";
-        firebaseDbServiceForRoomMemberLocationList = new FirebaseDbServiceForRoomMemberLocationList(this,
-                roomMemberLocationRecyclerViewAdapter, roomMemberLocationItemList, recyclerView, roomKey, roomName, roomMemberLocationKey,
-                (index)->intentMap(index));
+        firebaseDbServiceForRoomMemberLocationList = new FirebaseDbServiceForRoomMemberLocationList(
+                this, roomKey, roomName, roomMemberLocationKey,
+                (key, roomMemberLocationItem)->onAddedRoomMemberLocationListener(key, roomMemberLocationItem),
+                (key, roomMemberLocationItem)->onChangedRoomMemberLocationListener(key, roomMemberLocationItem),
+                (key)->onRemovedRoomMemberLocationListener(key));
     }
 
     /*
@@ -289,16 +290,39 @@ public class RoomMemberLocationListActivity extends AppCompatActivity {
     public void intentMapInit(int selectIndex){
         this.selectIndex = selectIndex;
 
-        firebaseDbServiceForRoomMemberLocationList.updateInServer(selectIndex);//상대 방에게 업데이트 요청
+        firebaseDbServiceForRoomMemberLocationList.updateInServer(roomMemberLocationRecyclerViewAdapter.getKey(selectIndex),
+                roomMemberLocationRecyclerViewAdapter.get(selectIndex));//상대 방에게 업데이트 요청
 
         LocationIntentThread locationIntentThread = new LocationIntentThread(this, selectIndex);
         Thread thread = new Thread(locationIntentThread, "locationIntentThread");
         thread.start();
     }
 
+    public void onAddedRoomMemberLocationListener(String key, RoomMemberLocationItem roomMemberLocationItem){
+        int index = roomMemberLocationRecyclerViewAdapter.add(key, roomMemberLocationItem); // 새 데이터를 itemList에 등록한다.
+        // key 값으로 등록된 데이터 항목이 없었기 때문에 새 데이터 항목이 등록된다.
+
+        if (roomMemberLocationRecyclerViewAdapter != null) {
+            roomMemberLocationRecyclerViewAdapter.notifyItemInserted(index); // RecyclerView를 다시 그린다.
+            //roomMemberRecyclerViewAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void onChangedRoomMemberLocationListener(String key, RoomMemberLocationItem roomMemberLocationItem){
+        int index = roomMemberLocationRecyclerViewAdapter.update(key, roomMemberLocationItem);  // 수정된 데이터를 itemList에 대입한다.
+        // 전에 key 값으로 등록되었던 데이터가  덮어써진다. (overwrite)
+
+        if (roomMemberLocationRecyclerViewAdapter != null) {
+            roomMemberLocationRecyclerViewAdapter.notifyItemChanged(index); // RecyclerView를 다시 그린다.
+            //roomMemberRecyclerViewAdapter.notifyDataSetChanged();
+        }
+
+        intentMap(index);
+    }
+
     public void intentMap(int selectIndex){
         if (this.selectIndex == selectIndex) {//사용자가 클릭한, index 일 때, 구글 지도로 넘겨주도록 했습니다.
-            RoomMemberLocationItem roomMemberLocationItem = roomMemberLocationItemList.get(selectIndex);//업데이트 받은 것 저장
+            RoomMemberLocationItem roomMemberLocationItem = roomMemberLocationRecyclerViewAdapter.get(selectIndex);//업데이트 받은 것 저장
 
             Log.v("pjw", "현재위치 \n위도 " + roomMemberLocationItem.getLatitude() + "\n경도 " + roomMemberLocationItem.getLongitude());
 
@@ -306,14 +330,18 @@ public class RoomMemberLocationListActivity extends AppCompatActivity {
             intent.setAction(Intent.ACTION_VIEW);
             intent.setPackage("com.google.android.apps.maps");
             //String data = "geo:"+roomMemberLocationItem.getLatitude()+", "+roomMemberLocationItem.getLongitude();
-            String data = locationDataStr(roomMemberLocationItem.getLatitude(), roomMemberLocationItem.getLongitude());
+            String data = LocationFunc.locationDataStr(roomMemberLocationItem.getLatitude(), roomMemberLocationItem.getLongitude());
             intent.setData(Uri.parse(data));
             startActivity(intent);
         }
     }
 
-    public static String locationDataStr(double latitude, double longitude){
-        return "geo:"+latitude+", "+longitude;
+    public void onRemovedRoomMemberLocationListener(String key){
+        int index = roomMemberLocationRecyclerViewAdapter.remove(key); // itemList에서 그 데이터 항목을 삭제한다.
+        if (roomMemberLocationRecyclerViewAdapter != null) {
+            roomMemberLocationRecyclerViewAdapter.notifyItemRemoved(index); // RecyclerView를 다시 그린다.
+            //roomMemberRecyclerViewAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override

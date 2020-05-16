@@ -3,8 +3,6 @@ package net.skhu.firechat2.FirebaseDBService;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -12,22 +10,22 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import net.skhu.firechat2.Item.RoomMemberLocationItem;
-import net.skhu.firechat2.Item.RoomMemberLocationItemList;
-import net.skhu.firechat2.ListenerInterface.RoomLocationListener.OnChildChangedLocationListener;
+import net.skhu.firechat2.ListenerInterface.RoomLocationListener.Firebase.OnChildAddedLocationListener;
+import net.skhu.firechat2.ListenerInterface.RoomLocationListener.Firebase.OnChildRemovedLocationListener;
+import net.skhu.firechat2.ListenerInterface.RoomLocationListener.Firebase.OnChildChangedLocationListener;
 import net.skhu.firechat2.Room.MemberLocation.GpsTracker;
-import net.skhu.firechat2.Room.MemberLocation.RoomMemberLocationRecyclerViewAdapter;
 
 import java.io.File;
 
 public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventListener {
 
     //MyRecyclerViewAdapter myRecyclerViewAdapter;
-    RoomMemberLocationRecyclerViewAdapter roomMemberLocationRecyclerViewAdapter;
+   // RoomMemberLocationRecyclerViewAdapter roomMemberLocationRecyclerViewAdapter;
     //ItemList itemList; // RecyclerView에 표시할 데이터 목록
-    RoomMemberLocationItemList roomMemberLocationItemList;
+    //RoomMemberLocationItemList roomMemberLocationItemList;
     DatabaseReference databaseReference;
     //String userId;
-    RecyclerView recyclerView;
+    //RecyclerView recyclerView;
     Context context;
 
     String downloadFileName;
@@ -54,15 +52,18 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
 
     String roomMemberLocationKey;
 
+    OnChildAddedLocationListener onChildAddedLocationListener;
     OnChildChangedLocationListener onChildChangedLocationListener;
+    OnChildRemovedLocationListener onChildRemovedLocationListener;
 
-    public FirebaseDbServiceForRoomMemberLocationList(Context context, RoomMemberLocationRecyclerViewAdapter roomMemberLocationRecyclerViewAdapter,
-                                                      RoomMemberLocationItemList roomMemberLocationItemList, RecyclerView recyclerView, String roomKey, String roomName, String roomMemberLocationKey,
-                                                      OnChildChangedLocationListener onChildChangedLocationListener) {
-        this.roomMemberLocationRecyclerViewAdapter = roomMemberLocationRecyclerViewAdapter;
-        this.roomMemberLocationItemList = roomMemberLocationItemList; // RecyclerView에 표시할 데이터 목록
+    public FirebaseDbServiceForRoomMemberLocationList(Context context,
+                                                      String roomKey, String roomName, String roomMemberLocationKey,
+                                                      OnChildAddedLocationListener onChildAddedLocationListener,
+                                                      OnChildChangedLocationListener onChildChangedLocationListener,
+                                                      OnChildRemovedLocationListener onChildRemovedLocationListener) {
+        //this.roomMemberLocationRecyclerViewAdapter = roomMemberLocationRecyclerViewAdapter;
+        //this.roomMemberLocationItemList = roomMemberLocationItemList; // RecyclerView에 표시할 데이터 목록
         //this.userId = userId;
-        this.recyclerView = recyclerView;
         this.roomName=roomName;
         this.roomMemberLocationKey = roomMemberLocationKey;
 
@@ -78,7 +79,9 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
         this.context = context;
         this.roomKey = roomKey;
 
+        this.onChildAddedLocationListener = onChildAddedLocationListener;
         this.onChildChangedLocationListener = onChildChangedLocationListener;
+        this.onChildRemovedLocationListener = onChildRemovedLocationListener;
         //this.roomName = roomName;
     }
 
@@ -112,10 +115,10 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
         }
     }*/
 
-    public void updateInServer(int index) {
+    public void updateInServer(String key, RoomMemberLocationItem roomMemberLocationItem) {
         // 서버에서 데이터를 update 한다.
-        String key = roomMemberLocationItemList.getKey(index);
-        RoomMemberLocationItem roomMemberLocationItem = roomMemberLocationItemList.get(index);
+        //String key = roomMemberLocationRecyclerViewAdapter.getKey(index);
+        //RoomMemberLocationItem roomMemberLocationItem = roomMemberLocationRecyclerViewAdapter.get(index);
 
         if (userKey == key){//해당 사용자에게 위치 upodate요청이 오면 현제 위치를 roomMemberLocationItem에 저장해서 upodate시키도록 했습니다.
             gpsTracker = new GpsTracker(context);
@@ -132,8 +135,8 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
         databaseReference.child(roomKey).child(roomMemberLocationKey).child(RoomMemberLocationList).child(key).setValue(roomMemberLocationItem);
     }
 
-    public void updateUserSelf(){
-        RoomMemberLocationItem roomMemberLocationItem = roomMemberLocationItemList.get(roomMemberLocationItemList.findIndex(userKey));
+    public void updateUserSelf(RoomMemberLocationItem roomMemberLocationItem){
+        //RoomMemberLocationItem roomMemberLocationItem = roomMemberLocationRecyclerViewAdapter.get(roomMemberLocationRecyclerViewAdapter.findIndex(userKey));
 
         gpsTracker = new GpsTracker(context);
 
@@ -150,6 +153,10 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
         //databaseReference.child(roomKey).child(roomMemberLocationKey).child(RoomMemberLocationList).child(userKey).setValue(roomMemberLocationItem);
     }
 
+    public String getUserKey(){
+        return userKey;
+    }
+
     public boolean diffLocation(RoomMemberLocationItem roomMemberLocationItem, double latitude, double longitude){
         if (roomMemberLocationItem.getLatitude() != latitude &&
                 roomMemberLocationItem.getLongitude() != longitude) {
@@ -159,27 +166,27 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
         return false;
     }
 
-    public void updateInServerAll() {
+//    public void updateInServerAll() {
         // 서버에서 데이터를 update 한다.
-        for (int i = 0; i < roomMemberLocationItemList.size(); i++) {
-            String key = roomMemberLocationItemList.getKey(i);
-            RoomMemberLocationItem roomMemberLocationItem = roomMemberLocationItemList.get(i);
+ ///       for (int i = 0; i < roomMemberLocationRecyclerViewAdapter.size(); i++) {
+//            String key = roomMemberLocationRecyclerViewAdapter.getKey(i);
+//            RoomMemberLocationItem roomMemberLocationItem = roomMemberLocationRecyclerViewAdapter.get(i);
 
-            if (userKey == key) {//해당 사용자에게 위치 upodate요청이 오면 현제 위치를 roomMemberLocationItem에 저장해서 upodate시키도록 했습니다.
-                gpsTracker = new GpsTracker(context);
+ //           if (userKey == key) {//해당 사용자에게 위치 upodate요청이 오면 현제 위치를 roomMemberLocationItem에 저장해서 upodate시키도록 했습니다.
+  //              gpsTracker = new GpsTracker(context);
 
-                double latitude = gpsTracker.getLatitude();
-                double longitude = gpsTracker.getLongitude();
-                if (roomMemberLocationItem.getLatitude() != latitude &&
-                        roomMemberLocationItem.getLongitude() != longitude) {
-                    roomMemberLocationItem.setLatitude(latitude);
-                    roomMemberLocationItem.setLongitude(longitude);
-                }
-            }
+   //             double latitude = gpsTracker.getLatitude();
+   //             double longitude = gpsTracker.getLongitude();
+    //            if (roomMemberLocationItem.getLatitude() != latitude &&
+    //                    roomMemberLocationItem.getLongitude() != longitude) {
+    //                roomMemberLocationItem.setLatitude(latitude);
+    //                roomMemberLocationItem.setLongitude(longitude);
+    //            }
+   //         }
 
-            databaseReference.child(roomKey).child(roomMemberLocationKey).child(RoomMemberLocationList).child(key).setValue(roomMemberLocationItem);
-        }
-    }
+ //           databaseReference.child(roomKey).child(roomMemberLocationKey).child(RoomMemberLocationList).child(key).setValue(roomMemberLocationItem);
+//        }
+ //   }
 
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
@@ -187,15 +194,20 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
         // dataSnapshot은 서버에서 등록된 새 데이터 항목이다.
         String key = dataSnapshot.getKey(); // 새 데이터 항목의 키 값을 꺼낸다.
         RoomMemberLocationItem roomMemberLocationItem = dataSnapshot.getValue(net.skhu.firechat2.Item.RoomMemberLocationItem.class);  // 새 데이터 항목을 꺼낸다.
-        int index = roomMemberLocationItemList.add(key, roomMemberLocationItem); // 새 데이터를 itemList에 등록한다.
+
+        //int index = roomMemberLocationRecyclerViewAdapter.add(key, roomMemberLocationItem); // 새 데이터를 itemList에 등록한다.
         // key 값으로 등록된 데이터 항목이 없었기 때문에 새 데이터 항목이 등록된다.
 
-        selectIndex = index;
+        //selectIndex = index;
 
-        if (roomMemberLocationRecyclerViewAdapter != null) {
-            roomMemberLocationRecyclerViewAdapter.notifyItemInserted(index); // RecyclerView를 다시 그린다.
+        //if (roomMemberLocationRecyclerViewAdapter != null) {
+           // roomMemberLocationRecyclerViewAdapter.notifyItemInserted(index); // RecyclerView를 다시 그린다.
             //roomMemberRecyclerViewAdapter.notifyDataSetChanged();
-        }
+        //}
+
+        //if (onChildAddedLocationListener != null){
+            onChildAddedLocationListener.onChildAddedLocationListener(key, roomMemberLocationItem);
+        //}
     }
 
     @Override
@@ -204,31 +216,32 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
         // dataSnapshot은 서버에서 수정된 데이터 항목이다.
         String key = dataSnapshot.getKey();  // 수정된 데이터 항목의 키 값을 꺼낸다.
         RoomMemberLocationItem roomMemberLocationItem = dataSnapshot.getValue(net.skhu.firechat2.Item.RoomMemberLocationItem.class); // 수정된 데이터 항목을 꺼낸다.
-        int index = roomMemberLocationItemList.update(key, roomMemberLocationItem);  // 수정된 데이터를 itemList에 대입한다.
+
+//        int index = roomMemberLocationRecyclerViewAdapter.update(key, roomMemberLocationItem);  // 수정된 데이터를 itemList에 대입한다.
         // 전에 key 값으로 등록되었던 데이터가  덮어써진다. (overwrite)
 
-        if (userKey == key){//해당 사용자에게 위치 upodate요청이 오면 현제 위치를 upodate시키도록 했습니다.
+//        if (userKey == key){//해당 사용자에게 위치 upodate요청이 오면 현제 위치를 upodate시키도록 했습니다.
 
-            gpsTracker = new GpsTracker(context);
+//            gpsTracker = new GpsTracker(context);
 
-            double latitude = gpsTracker.getLatitude();
-            double longitude = gpsTracker.getLongitude();
+//            double latitude = gpsTracker.getLatitude();
+//            double longitude = gpsTracker.getLongitude();
 
             //현제 위치가 이미 update 되어 있으면, 더 이상 update하지 않도록 해주었습니다.
-            if (roomMemberLocationItemList.get(roomMemberLocationItemList.findIndex(userKey)).getLatitude() != latitude &&
-                    roomMemberLocationItemList.get(roomMemberLocationItemList.findIndex(userKey)).getLongitude() != longitude) {
-                updateInServer(roomMemberLocationItemList.findIndex(userKey));
-            }
-        }
+ //           if (roomMemberLocationRecyclerViewAdapter.get(roomMemberLocationRecyclerViewAdapter.findIndex(userKey)).getLatitude() != latitude &&
+ //                   roomMemberLocationRecyclerViewAdapter.get(roomMemberLocationRecyclerViewAdapter.findIndex(userKey)).getLongitude() != longitude) {
+ //               updateInServer(roomMemberLocationRecyclerViewAdapter.findIndex(userKey));
+//           }
+ //       }
 
-        if(onChildChangedLocationListener != null) {
-            onChildChangedLocationListener.onChildChangedLocation(roomMemberLocationItemList.findIndex(key));
-        }
-
-        if (roomMemberLocationRecyclerViewAdapter != null) {
-            roomMemberLocationRecyclerViewAdapter.notifyItemChanged(index); // RecyclerView를 다시 그린다.
+ //       if (roomMemberLocationRecyclerViewAdapter != null) {
+//            roomMemberLocationRecyclerViewAdapter.notifyItemChanged(index); // RecyclerView를 다시 그린다.
             //roomMemberRecyclerViewAdapter.notifyDataSetChanged();
-        }
+//        }
+
+       // if(onChildChangedLocationListener != null) {
+            onChildChangedLocationListener.onChildChangedLocation(key, roomMemberLocationItem);
+        //}
     }
 
     @Override
@@ -236,11 +249,16 @@ public class FirebaseDbServiceForRoomMemberLocationList implements ChildEventLis
         // DB의 어떤 데이터 항목이 삭제 되었을 때, 이 메소드가 자동으로 호출된다.
         // dataSnapshot은 서버에서 삭제된 데이터 항목이다.
         String key = dataSnapshot.getKey(); // 삭제된 데이터 항목의 키 값을 꺼낸다.
-        int index = roomMemberLocationItemList.remove(key); // itemList에서 그 데이터 항목을 삭제한다.
-        if (roomMemberLocationRecyclerViewAdapter != null) {
-            roomMemberLocationRecyclerViewAdapter.notifyItemRemoved(index); // RecyclerView를 다시 그린다.
+
+//        int index = roomMemberLocationRecyclerViewAdapter.remove(key); // itemList에서 그 데이터 항목을 삭제한다.
+//        if (roomMemberLocationRecyclerViewAdapter != null) {
+//            roomMemberLocationRecyclerViewAdapter.notifyItemRemoved(index); // RecyclerView를 다시 그린다.
             //roomMemberRecyclerViewAdapter.notifyDataSetChanged();
-        }
+//        }
+
+       // if(onChildRemovedLocationListener != null) {
+            onChildRemovedLocationListener.onChildRemovedLocationListener(key);
+        //}
     }
 
     @Override

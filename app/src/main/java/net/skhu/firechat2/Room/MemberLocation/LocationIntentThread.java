@@ -29,7 +29,7 @@ public class LocationIntentThread implements Runnable {
         }
 
 
-        RoomMemberLocationItem roomMemberLocationItem = activity.roomMemberLocationItemList.get(selectIndex);//업데이트 받은 것 저장
+        RoomMemberLocationItem roomMemberLocationItem = activity.roomMemberLocationRecyclerViewAdapter.get(selectIndex);//업데이트 받은 것 저장
 
         Log.v("pjw", "현재위치 \n위도 " + roomMemberLocationItem.getLatitude() + "\n경도 " + roomMemberLocationItem.getLongitude());
 
@@ -37,12 +37,8 @@ public class LocationIntentThread implements Runnable {
         intent.setAction(Intent.ACTION_VIEW);
         intent.setPackage("com.google.android.apps.maps");
         //String data = "geo:"+roomMemberLocationItem.getLatitude()+", "+roomMemberLocationItem.getLongitude();
-        String data = locationDataStr(roomMemberLocationItem.getLatitude(), roomMemberLocationItem.getLongitude());
+        String data = LocationFunc.locationDataStr(roomMemberLocationItem.getLatitude(), roomMemberLocationItem.getLongitude());
         intent.setData(Uri.parse(data));
         activity.startActivity(intent);
-    }
-
-    public static String locationDataStr(double latitude, double longitude){
-        return "geo:"+latitude+", "+longitude;
     }
 }
