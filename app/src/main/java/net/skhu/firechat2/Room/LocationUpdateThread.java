@@ -7,12 +7,14 @@ import net.skhu.firechat2.ListenerInterface.RoomLocationListener.OnUpdateUserSel
 public class LocationUpdateThread implements Runnable {
     //View view;
     Context context;
+    long sleepMillis;
     OnUpdateUserSelfListener onUpdateUserSelfListener;
     private volatile boolean shutdown = false;
 
-    public LocationUpdateThread(Context context, OnUpdateUserSelfListener onUpdateUserSelfListener) {
+    public LocationUpdateThread(Context context, long sleepMillis, OnUpdateUserSelfListener onUpdateUserSelfListener) {
         //this.view = view;
         this.context = context;
+        this.sleepMillis = sleepMillis;
         this.onUpdateUserSelfListener = onUpdateUserSelfListener;
     }
 
@@ -22,7 +24,7 @@ public class LocationUpdateThread implements Runnable {
 
         while(true) {
             try {
-                Thread.sleep(2000); //0.5초 대기
+                Thread.sleep(sleepMillis); //0.5초 대기
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -179,7 +179,7 @@ public class RoomActivity extends AppCompatActivity {
 
         //Toast.makeText(RoomActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
 
-        locationUpdateThread = new LocationUpdateThread(this,
+        locationUpdateThread = new LocationUpdateThread(this, 2000,
                 ()->updateLocationUserSelf());
         Thread t = new Thread(locationUpdateThread,"locationUpdateThread");
 
