@@ -1,4 +1,4 @@
-package net.skhu.firechat2.Room;
+package net.skhu.firechat2.Room.Thread;
 
 import android.util.Log;
 

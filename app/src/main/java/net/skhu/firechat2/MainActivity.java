@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         if (initInformDialog == null) {// 대화상자 관리자 객체를 아직 만들지 않았다면
             initInformDialog = new InitInformDialog(); // 대화상자 관리자 객체를 만든다
         }
-        initInformDialog.show(getSupportFragmentManager(), "EditDialog"); // 화면에 대화상자 보이기
+        initInformDialog.show(getSupportFragmentManager(), "InitInformDialog"); // 화면에 대화상자 보이기
     }
 
     //정보 알리는 다이얼 로그
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
         if (roomCreateDialog == null) {// 대화상자 관리자 객체를 아직 만들지 않았다면
             roomCreateDialog = new RoomCreateDialog(); // 대화상자 관리자 객체를 만든다
         }
-        roomCreateDialog.show(getSupportFragmentManager(), "EditDialog"); // 화면에 대화상자 보이기
+        roomCreateDialog.show(getSupportFragmentManager(), "RoomCreateDialog"); // 화면에 대화상자 보이기
     }
 
     public void intentRoom(int selectIndex){

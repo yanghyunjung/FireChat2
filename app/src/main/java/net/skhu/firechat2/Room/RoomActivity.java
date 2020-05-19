@@ -49,7 +49,6 @@ import net.skhu.firechat2.FirebaseDBService.FirebaseStorageService;
 import net.skhu.firechat2.FirebaseDBService.MusicUploadActivity;
 import net.skhu.firechat2.FirebaseDBService.PhotoUploadActivity;
 import net.skhu.firechat2.FirebaseDBService.VideoUploadActivity;
-import net.skhu.firechat2.InitInformDialog;
 import net.skhu.firechat2.Item.Item;
 import net.skhu.firechat2.Item.RoomMemberLocationItem;
 import net.skhu.firechat2.R;
@@ -59,6 +58,8 @@ import net.skhu.firechat2.Room.MemberLocation.RoomMemberLocationListActivity;
 import net.skhu.firechat2.Room.MemberLocation.RoomMemberLocationRecyclerViewAdapter;
 import net.skhu.firechat2.Room.Preview.PhotoPreviewActivity;
 import net.skhu.firechat2.Room.Preview.VideoPreviewActivity;
+import net.skhu.firechat2.Room.Thread.LocationUpdateThread;
+import net.skhu.firechat2.Room.Thread.RemoveFileThread;
 import net.skhu.firechat2.UnCatchTaskService;
 
 import java.io.File;
@@ -85,7 +86,6 @@ public class RoomActivity extends AppCompatActivity {
     ItemEditDialogFragment itemEditDialogFragment; // 수정 대화상자 관리자
     RenameDiolog renameDiolog;//이름 변경 대화상자 관리자
     ScrollDiolog scrollDiolog;
-    InitInformDialog initInformDialog;
     MusicPreviewDialog musicPreviewDialog;
 
 
@@ -289,21 +289,21 @@ public class RoomActivity extends AppCompatActivity {
         if (renameDiolog == null) {// 대화상자 관리자 객체를 아직 만들지 않았다면
             renameDiolog = new RenameDiolog(); // 대화상자 관리자 객체를 만든다
         }
-        renameDiolog.show(getSupportFragmentManager(), "EditDialog"); // 화면에 대화상자 보이기
+        renameDiolog.show(getSupportFragmentManager(), "RenameDialog"); // 화면에 대화상자 보이기
     }
 
     public void showScrollDialog() {
         if (scrollDiolog == null) {// 대화상자 관리자 객체를 아직 만들지 않았다면
             scrollDiolog = new ScrollDiolog(); // 대화상자 관리자 객체를 만든다
         }
-        scrollDiolog.show(getSupportFragmentManager(), "EditDialog"); // 화면에 대화상자 보이기
+        scrollDiolog.show(getSupportFragmentManager(), "ScrollDialog"); // 화면에 대화상자 보이기
     }
 
     public void showMusicPreviewDialog() {
         if (musicPreviewDialog == null) {// 대화상자 관리자 객체를 아직 만들지 않았다면
             musicPreviewDialog = new MusicPreviewDialog(); // 대화상자 관리자 객체를 만든다
         }
-        musicPreviewDialog.show(getSupportFragmentManager(), "EditDialog"); // 화면에 대화상자 보이기
+        musicPreviewDialog.show(getSupportFragmentManager(), "MusicPreviewDialog"); // 화면에 대화상자 보이기
     }
 
     public void intentPhotoPreview(int selectIndex){
